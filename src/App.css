@@ -1,0 +1,426 @@
+.page-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/*
+ * Keep the page content above the background canvas. Named explicitly rather
+ * than as `#root > *`, so the layers that position themselves — the fixed
+ * masthead, the scanline overlay — keep the positioning they ask for.
+ */
+.screen,
+#about,
+.depths {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * The first viewport, with the about section scrolling in underneath it. The
+ * masthead floats above out of flow, so the padding here stands in for the
+ * space it used to occupy — border-box keeps the whole thing one screen tall.
+ */
+.screen {
+  box-sizing: border-box;
+  min-height: 100svh;
+  padding-top: var(--masthead-h);
+  display: flex;
+  flex-direction: column;
+}
+
+/* -------------------------------------------------------------------- hero */
+
+#hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 20px 10vh;
+}
+
+.wordmark {
+  position: relative;
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: var(--fs-hero);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  margin: 0;
+  color: #fff;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.85),
+    0 0 26px rgba(255, 106, 213, 0.9),
+    0 0 60px rgba(193, 59, 214, 0.75),
+    0 0 110px rgba(255, 106, 213, 0.5);
+  /*
+   * Two bursts share this element. The 6s one is the idle signal loss that
+   * runs forever; the second is the boot — one hard, short burst as the title
+   * screen comes up, and then never again. It is listed last so that for the
+   * ~380ms it runs it wins the transform, which is what an opening should do.
+   */
+  animation:
+    glitch-jitter 6s steps(1, end) infinite,
+    /*
+     * `backwards`, never `forwards`: this one is listed after the idle burst,
+     * so a forwards fill would hold its own resting frame over the top of the
+     * 6s glitch for the rest of the session and the idle burst would never be
+     * seen again. The pseudo-elements inherit this shorthand, so the same
+     * holds for the two colour copies.
+     */
+    boot-jitter 560ms steps(1, end) 1 backwards;
+}
+
+/*
+ * Two offset copies of the wordmark, sliced into horizontal bands, sit idle at
+ * zero opacity and flash for the last ~0.6s of each 6s cycle — the periodic
+ * burst. `steps(1, end)` keeps every state a hard cut, so it reads as signal
+ * loss rather than a smooth tween.
+ */
+.wordmark::before,
+.wordmark::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  animation: inherit;
+}
+
+.wordmark::before {
+  color: #ff2d95;
+  text-shadow: 0 0 12px rgba(255, 45, 149, 0.9);
+  animation-name: glitch-magenta, boot-magenta;
+}
+
+.wordmark::after {
+  color: #45e5ff;
+  text-shadow: 0 0 12px rgba(69, 229, 255, 0.9);
+  animation-name: glitch-cyan, boot-cyan;
+}
+
+@keyframes glitch-jitter {
+  0%,
+  89%,
+  100% {
+    transform: none;
+  }
+  90% {
+    transform: translate(4px, -2px);
+  }
+  92% {
+    transform: translate(-5px, 1px) skewX(3deg);
+  }
+  94% {
+    transform: translate(3px, 2px);
+  }
+  96% {
+    transform: translate(-2px, 0);
+  }
+  98% {
+    transform: none;
+  }
+}
+
+@keyframes glitch-magenta {
+  0%,
+  89%,
+  99%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  90% {
+    opacity: 0.9;
+    transform: translate(-7px, -3px);
+    clip-path: inset(8% 0 68% 0);
+  }
+  92% {
+    opacity: 0.9;
+    transform: translate(6px, 2px);
+    clip-path: inset(42% 0 34% 0);
+  }
+  94% {
+    opacity: 0.9;
+    transform: translate(-9px, 1px);
+    clip-path: inset(70% 0 6% 0);
+  }
+  96% {
+    opacity: 0.9;
+    transform: translate(5px, -2px);
+    clip-path: inset(22% 0 58% 0);
+  }
+  98% {
+    opacity: 0.6;
+    transform: translate(-3px, 0);
+    clip-path: inset(55% 0 22% 0);
+  }
+}
+
+@keyframes glitch-cyan {
+  0%,
+  89%,
+  99%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  90% {
+    opacity: 0.9;
+    transform: translate(7px, 3px);
+    clip-path: inset(60% 0 14% 0);
+  }
+  92% {
+    opacity: 0.9;
+    transform: translate(-6px, -2px);
+    clip-path: inset(16% 0 62% 0);
+  }
+  94% {
+    opacity: 0.9;
+    transform: translate(9px, -1px);
+    clip-path: inset(36% 0 44% 0);
+  }
+  96% {
+    opacity: 0.9;
+    transform: translate(-5px, 2px);
+    clip-path: inset(76% 0 4% 0);
+  }
+  98% {
+    opacity: 0.6;
+    transform: translate(3px, 0);
+    clip-path: inset(30% 0 48% 0);
+  }
+}
+
+/* ------------------------------------------------------------- the boot
+
+   The title screen does not fade up, it tunes in: the wordmark and the two
+   lines under it snap on out of alignment, tear a few times, and lock. Every
+   one of these runs on `steps(1, end)` so no frame ever tweens into the next
+   — a glitch that eases is a wipe, not a glitch.
+
+   Short by design. The whole burst is well under a second and the subtitles
+   trail the wordmark by a beat each, so the screen resolves top-down.
+   -------------------------------------------------------------------------- */
+
+@keyframes boot-jitter {
+  0% {
+    opacity: 0;
+    transform: translate(-14px, 4px) skewX(-14deg);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(11px, -5px) skewX(9deg);
+  }
+  25% {
+    opacity: 0.35;
+    transform: translate(-8px, 3px) skewX(-5deg);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(6px, 2px);
+  }
+  55% {
+    opacity: 0.6;
+    transform: translate(-5px, -3px) skewX(4deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(3px, 1px);
+  }
+  85% {
+    transform: translate(-2px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The two colour copies tear along with it, in opposite directions. */
+@keyframes boot-magenta {
+  0% {
+    opacity: 0.95;
+    transform: translate(-16px, -4px);
+    clip-path: inset(4% 0 62% 0);
+  }
+  25% {
+    opacity: 0.9;
+    transform: translate(12px, 3px);
+    clip-path: inset(48% 0 26% 0);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate(-9px, 2px);
+    clip-path: inset(68% 0 8% 0);
+  }
+  75% {
+    opacity: 0.5;
+    transform: translate(4px, -1px);
+    clip-path: inset(20% 0 56% 0);
+  }
+  90%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes boot-cyan {
+  0% {
+    opacity: 0.95;
+    transform: translate(16px, 4px);
+    clip-path: inset(56% 0 12% 0);
+  }
+  25% {
+    opacity: 0.9;
+    transform: translate(-12px, -3px);
+    clip-path: inset(12% 0 66% 0);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate(9px, -2px);
+    clip-path: inset(32% 0 42% 0);
+  }
+  75% {
+    opacity: 0.5;
+    transform: translate(-4px, 1px);
+    clip-path: inset(74% 0 6% 0);
+  }
+  90%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+/*
+ * The subtitles have no duplicate layers to tear, so their glitch is carried
+ * by the glow instead: for a few frames the shadow splits into a magenta and
+ * a cyan ghost either side of the text, then collapses back onto the neon the
+ * lines normally wear.
+ */
+@keyframes boot-line {
+  0% {
+    opacity: 0;
+    transform: translate(-10px, 0) skewX(-10deg);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(8px, 0);
+    text-shadow:
+      -4px 0 0 rgba(255, 45, 149, 0.9),
+      4px 0 0 rgba(69, 229, 255, 0.9);
+  }
+  35% {
+    opacity: 0.3;
+    transform: translate(-5px, 1px);
+  }
+  55% {
+    opacity: 1;
+    transform: translate(4px, -1px);
+    text-shadow:
+      3px 0 0 rgba(69, 229, 255, 0.85),
+      -3px 0 0 rgba(255, 45, 149, 0.85);
+  }
+  75% {
+    opacity: 0.7;
+    transform: translate(-2px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The burst is decorative — hold the wordmark still if motion is unwelcome. */
+@media (prefers-reduced-motion: reduce) {
+  .wordmark,
+  .wordmark::before,
+  .wordmark::after,
+  .tagline,
+  .details {
+    animation: none;
+  }
+}
+
+.tagline {
+  font-family: var(--pixel);
+  font-size: var(--fs-hero-sub);
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #fff;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.7),
+    0 0 20px rgba(255, 106, 213, 0.85),
+    0 0 44px rgba(193, 59, 214, 0.6);
+  animation: boot-line 470ms steps(1, end) 130ms 1 both;
+}
+
+.details {
+  font-family: var(--pixel);
+  font-size: var(--fs-hero-meta);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #fff;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.6),
+    0 0 18px rgba(255, 106, 213, 0.7);
+  animation: boot-line 470ms steps(1, end) 250ms 1 both;
+
+  span {
+    margin: 0 0.4em;
+  }
+}
+
+.signup {
+  margin-top: 12px;
+  font-family: var(--pixel);
+  font-size: var(--fs-button);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #2a0a3d;
+  background: linear-gradient(180deg, #fff 0%, #ffd9f4 100%);
+  padding: 18px 34px;
+  border: 2px solid #fff;
+  box-shadow:
+    0 0 18px rgba(255, 106, 213, 0.75),
+    0 0 60px rgba(255, 106, 213, 0.45);
+
+  /* Hover paints the same top-to-bottom ramp the canvas sun uses. */
+  &:hover,
+  &:focus-visible {
+    background: linear-gradient(
+      180deg,
+      #ffd166 0%,
+      #ff9f45 25%,
+      #ff5f6d 50%,
+      #f43b8f 75%,
+      #c13bd6 100%
+    );
+    box-shadow:
+      0 0 26px rgba(255, 106, 213, 0.95),
+      0 0 90px rgba(255, 106, 213, 0.6);
+  }
+
+  /*
+   * Pressed. The travel down is the shared press in index.css; this only pulls
+   * the glow in behind it, so the button reads as sitting closer to the page.
+   */
+  &:active {
+    box-shadow:
+      0 0 10px rgba(255, 106, 213, 0.7),
+      0 0 34px rgba(255, 106, 213, 0.4);
+  }
+
+  @media (max-width: 720px) {
+    padding: 14px 26px;
+  }
+}

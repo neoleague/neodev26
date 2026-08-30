@@ -1,0 +1,242 @@
+html {
+  /* The masthead links jump down the page — ride there instead of teleporting. */
+  scroll-behavior: smooth;
+}
+
+/*
+ * Scroll anchoring off, page-wide. When an FAQ card opens, the browser picks
+ * something further down — a later question, or the contact section — as its
+ * anchor and scrolls to hold that still, which drags everything above the card
+ * up the screen. The card is growth in flow: what is under it should move down
+ * and what is over it should not move at all. Scoping this to the FAQ list is
+ * not enough, because the anchor the browser chooses is usually below it.
+ */
+html,
+body {
+  overflow-anchor: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+:root {
+  /*
+   * Lets `auto` be a value an animation can travel to, which is what the FAQ
+   * cards need to open from nothing to whatever height their answer comes to.
+   * On its own it animates nothing — it only makes the keyword interpolable.
+   */
+  interpolate-size: allow-keywords;
+
+  /* Neon palette, shared by every section of the site. */
+  --text: #cbb7e8;
+  --text-h: #fff;
+  --accent: #ff6ad5;
+  --accent-soft: rgba(255, 106, 213, 0.35);
+  --grid: #d17fff;
+  --sky: #1b0b38;
+
+  /*
+   * Type system. Two faces, and nothing else on the site:
+   *
+   *   --pixel  display type and UI chrome — titles, labels, codes, numerals.
+   *            Always uppercase, always tracked out.
+   *   --sans   running prose, and only running prose.
+   *
+   * Every font-size on the site comes from one of the steps below; no rule
+   * sets a raw size of its own.
+   */
+  /*
+   * The water the wave sweep leaves behind. The transition overlay and the FAQ
+   * section paint this same stack from their own top edge, and the sweep ends
+   * by putting the FAQ's top exactly where the overlay was — so the two agree
+   * pixel for pixel and the handover is invisible.
+   *
+   * The scene is attached to the viewport rather than to either element. That
+   * keeps it composed at a sane scale down a section thousands of pixels tall,
+   * and means the overlay and the section show the same pixels of it without
+   * having to know anything about each other's position.
+   */
+  --sea-image: url('./assets/underwaterbackground.webp') center / cover fixed
+    no-repeat;
+  /*
+   * Dusk over the scene, deepening down the page. Stops are in px so they
+   * measure from each element's own top: percentages would resolve against two
+   * different heights and the handover would show.
+   */
+  --sea-column: linear-gradient(
+    180deg,
+    rgba(0, 22, 52, 0.46) 0,
+    rgba(0, 18, 44, 0.56) 700px,
+    rgba(0, 12, 32, 0.74) 1600px,
+    rgba(0, 7, 20, 0.86) 2600px
+  );
+  --sea-floor: #000814;
+
+  /*
+   * Bevelled window chrome, in the site's palette rather than Win95 grey.
+   * Shared: the about section's text viewer and the contact form are the same
+   * furniture, and should stay the same colour.
+   */
+  --chrome: #cfc4e4;
+  --chrome-lit: #f7f3fd;
+  --chrome-dark: #6a5590;
+  --chrome-ink: #2a0f47;
+  --paper: #f7f2fc;
+  --paper-ink: #32164f;
+
+  /*
+   * Height the pinned masthead occupies. The masthead itself is out of flow,
+   * so the first screen reserves exactly this much to keep the hero centred
+   * where it sat when the masthead was still in the document flow.
+   */
+  --masthead-h: 74px;
+
+  --pixel: 'Press Start 2P', ui-monospace, Consolas, monospace;
+  --sans: 'Chakra Petch', system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  --fs-hero: clamp(48px, 11vw, 150px);
+  --fs-hero-sub: clamp(12px, 2.6vw, 34px);
+  --fs-hero-meta: clamp(12px, 1.9vw, 24px);
+  --fs-display: clamp(19px, 5.1vw, 62px);
+  --fs-stat: clamp(20px, 2.4vw, 34px);
+  --fs-button: clamp(13px, 1.5vw, 20px);
+  --fs-nav: 17px;
+  --fs-nav-sm: 14px;
+  --fs-label: clamp(10px, 1.05vw, 12px);
+  --fs-micro: 9px;
+  --fs-body: clamp(15px, 1.15vw, 17px);
+
+  font: 18px/145% var(--sans);
+  color-scheme: dark;
+  color: var(--text);
+  background: var(--sky);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+
+  /* Stacked masthead: nav on one line, socials beneath it. */
+  @media (max-width: 720px) {
+    --masthead-h: 108px;
+  }
+}
+
+body {
+  margin: 0;
+  /* Matches the canvas sky so overscroll never flashes the default page color. */
+  background: var(--sky);
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+/* Visible to screen readers only. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------- press */
+
+/*
+ * Every control on the site goes down under the finger and springs back up on
+ * release — the one piece of feedback shared by the neon buttons, the nav, the
+ * socials and the FAQ cards, so a click always feels like the same click.
+ *
+ * The travel is on the `translate` property rather than inside `transform`.
+ * Several of these elements already animate `transform` for their own reasons
+ * (the FAQ card leans into its shadow on hover, the card's chevron flips when
+ * it opens); `translate` composes with those instead of overwriting them, so a
+ * control can be pressed and doing its own thing at the same time.
+ *
+ * Down is short and linear — it should already be at the bottom by the time a
+ * normal click lets go. Up is longer and overshoots slightly, which is the part
+ * that reads as springy.
+ */
+:root {
+  --press-drop: 3px;
+  --press-in: 55ms;
+  --press-out: 260ms;
+  --press-in-ease: cubic-bezier(0.4, 0, 1, 1);
+  --press-out-ease: cubic-bezier(0.18, 1.5, 0.42, 1);
+}
+
+/*
+ * The standard controls, caught by tag rather than by class, so a button or a
+ * link added later is pressable the moment it exists. `.press` is the opt-in
+ * for anything clickable that is none of these — see CLAUDE.md.
+ */
+button,
+summary,
+a[href],
+input[type='submit'],
+input[type='button'],
+[role='button'],
+.press {
+  transition: translate var(--press-out) var(--press-out-ease);
+  /* No blue flash on tap — the press itself is the feedback. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active,
+summary:active,
+a[href]:active,
+input[type='submit']:active,
+input[type='button']:active,
+[role='button']:active,
+.press:active {
+  translate: 0 var(--press-drop);
+  transition-duration: var(--press-in);
+  transition-timing-function: var(--press-in-ease);
+}
+
+/*
+ * Disabled controls are not going anywhere. Guards against a future form
+ * button that greys itself out while submitting still bouncing when clicked.
+ */
+button:disabled:active,
+input:disabled:active,
+[aria-disabled='true']:active {
+  translate: none;
+}
+
+/* The press is motion for its own sake — hold everything still if asked. */
+@media (prefers-reduced-motion: reduce) {
+  button,
+  summary,
+  a[href],
+    input[type='submit'],
+  input[type='button'],
+  [role='button'],
+  .press {
+    transition: none;
+  }
+
+  button:active,
+  summary:active,
+  a[href]:active,
+    input[type='submit']:active,
+  input[type='button']:active,
+  [role='button']:active,
+  .press:active {
+    translate: none;
+  }
+}

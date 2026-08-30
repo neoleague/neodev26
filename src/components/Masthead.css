@@ -1,0 +1,122 @@
+/* ==========================================================================
+   Masthead — the pinned bar of nav links and social icons.
+
+   Shared by every page on the site (the title screen and the sponsor page),
+   so it owns its own stylesheet rather than living in App.css.
+   ========================================================================== */
+
+/*
+ * Pinned to the top for the whole scroll. Fixed rather than sticky: the hero
+ * below it is a full 100svh, so a sticky bar would give the front page a
+ * scrollbar for the sake of its own height.
+ */
+/*
+ * Pinned to the top for the whole scroll — no bar behind it, just the links
+ * floating over the page. Fixed rather than sticky: the hero below is a full
+ * 100svh, so a sticky masthead would add its own height on top of that.
+ *
+ * The height is set rather than left to the content so it always matches the
+ * space `.screen` reserves for it.
+ */
+#masthead {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Above the wave sweep's stage, so the nav stays reachable throughout it. */
+  z-index: 4;
+  height: var(--masthead-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 32px;
+
+  @media (max-width: 720px) {
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    padding: 0 20px;
+  }
+}
+
+.nav-links,
+.socials {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links {
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  /* The dash separators from the reference layout. */
+  li + li::before {
+    content: '–';
+    margin-right: 18px;
+    color: var(--accent-soft);
+  }
+
+  a {
+    /*
+     * Inline-block so the shared press can move it: `translate` has no effect
+     * on a non-replaced inline box, and these are otherwise plain inline links.
+     */
+    display: inline-block;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: var(--fs-nav);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-h);
+    text-decoration: none;
+    text-shadow: 0 0 10px var(--accent-soft);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--accent);
+      text-shadow: 0 0 14px var(--accent);
+    }
+  }
+
+  /* Dashes read as orphans once the list wraps, so drop them on small screens. */
+  @media (max-width: 720px) {
+    gap: 8px 16px;
+    a {
+      font-size: var(--fs-nav-sm);
+    }
+    li + li::before {
+      content: none;
+    }
+  }
+}
+
+.socials {
+  gap: 14px;
+
+  a {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(255, 106, 213, 0.16);
+      box-shadow: 0 0 18px var(--accent-soft);
+    }
+  }
+}
+
+.social-icon {
+  width: 20px;
+  height: 20px;
+  /* Sprite symbols ship dark; force them white whatever their source fill. */
+  filter: brightness(0) invert(1) drop-shadow(0 0 6px var(--accent-soft));
+}
+

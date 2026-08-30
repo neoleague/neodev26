@@ -1,0 +1,370 @@
+/* ==========================================================================
+   FAQ — the dive.
+
+   The wave sweep above hands the reader over already underwater, so this
+   section opens straight into the sea. The questions run straight down one
+   column while the water darkens toward the seabed. Its palette is sampled
+   from wave.webp so the sea reads as the same water the wave was.
+
+   Type: steps come from the scale in index.css. --pixel is display type and UI
+   chrome, --sans is running prose. Nothing else.
+   ========================================================================== */
+
+#faq {
+  --foam: #2fd8d8;
+  --sea-line: rgba(47, 216, 216, 0.42);
+  --sea-ink: #d3d0f0;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  text-align: left;
+  padding: clamp(60px, 12vh, 140px) 0 0;
+  /*
+   * A screenful at least. With a short list of questions the column no longer
+   * fills the viewport on its own, and the sweep hands the reader over into
+   * this section — arriving to see its bottom edge and the seabed already on
+   * screen would undo the sense of having gone under.
+   */
+  box-sizing: border-box;
+  min-height: 100svh;
+  /* Land clear of the pinned masthead when the nav link jumps here. */
+  scroll-margin-top: 76px;
+
+  /*
+   * The same water the wave sweep leaves behind, painted from the same top
+   * edge — the sweep ends by putting this element's top exactly where the
+   * overlay was, so the handover shows nothing. Defined in index.css.
+   */
+  background: var(--sea-column), var(--sea-image);
+  background-color: var(--sea-floor);
+}
+
+/* ------------------------------------------------------------- the water */
+
+.deep {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Light shafts angling down from the surface. */
+.deep-rays span {
+  position: absolute;
+  top: 0;
+  height: min(1400px, 85%);
+  transform: rotate(var(--tilt));
+  transform-origin: top center;
+  background: linear-gradient(
+    180deg,
+    rgba(186, 232, 255, 0) 0%,
+    rgba(186, 232, 255, 0.2) 34%,
+    rgba(186, 232, 255, 0.07) 62%,
+    rgba(186, 232, 255, 0) 88%
+  );
+  /* Without this the shafts read as flat translucent bars. */
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 38%,
+    #000 62%,
+    transparent 100%
+  );
+  filter: blur(16px);
+  animation: ray-breathe 9s ease-in-out infinite alternate;
+}
+
+@keyframes ray-breathe {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The sprite fills the span; the span only carries position and motion. */
+.deep-bubbles span {
+  position: absolute;
+  bottom: -80px;
+  color: rgba(186, 232, 255, 0.9);
+  animation-name: bubble-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.pixel-bubble {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Keeps the pixels square when the browser scales the sprite up. */
+  image-rendering: pixelated;
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  88% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(var(--drift), -125vh) scale(1.15);
+    opacity: 0;
+  }
+}
+
+.seabed {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: clamp(120px, 15vw, 220px);
+}
+
+.seabed-far {
+  fill: #021230;
+  stroke: rgba(47, 216, 216, 0.22);
+  stroke-width: 2;
+}
+
+/* Hard steps, no anti-aliasing — see the ridge maths in FaqSection.jsx. */
+.seabed {
+  shape-rendering: crispedges;
+}
+
+.seabed-near {
+  fill: #000610;
+}
+
+/* ------------------------------------------------------------- the content */
+
+.faq-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 56px) clamp(110px, 18vh, 220px);
+}
+
+.faq-head {
+  text-align: center;
+  margin-bottom: clamp(44px, 8vh, 100px);
+}
+
+.faq-title {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: var(--fs-display);
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+  /* The title screen's neon, in the wave's own colours — cyan off its streaks,
+     pink off its foam. */
+  color: #fff;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.85),
+    0 0 26px rgba(47, 216, 216, 0.9),
+    0 0 60px rgba(240, 176, 224, 0.6),
+    0 0 110px rgba(47, 216, 216, 0.5);
+}
+
+/* ------------------------------------------------------------- the descent */
+
+/*
+ * One column, running straight down. The questions used to alternate either
+ * side of a centre line, hung off a depth gauge; the stagger only bought holes
+ * — open a card on one side and everything below it drops, leaving the other
+ * side empty — and the gauge line went with it.
+ */
+.dive {
+  position: relative;
+  /* Held in from the full column: one question per row across the whole page
+     is a long way for one line of answer to run. */
+  max-width: 880px;
+  margin: 0 auto;
+  list-style: none;
+  padding: 0;
+}
+
+.station {
+  position: relative;
+  margin-bottom: clamp(18px, 3vh, 34px);
+}
+
+/* ------------------------------------------------------------- the cards */
+
+/*
+ * A readout panel, not a pane of glass: flat fill, a hard two pixel edge and a
+ * solid unblurred shadow dropped behind it — the same language as the beach's
+ * taped photographs and its bevelled window, in the water's colours.
+ */
+.card {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(47, 216, 216, 0.045) 0 7px,
+      rgba(0, 0, 0, 0) 7px 14px
+    ),
+    linear-gradient(180deg, #012456 0%, #001435 100%);
+  border: 2px solid var(--sea-line);
+  box-shadow: 5px 5px 0 rgba(0, 4, 14, 0.55);
+  transition:
+    border-color 0.16s steps(2, end),
+    transform 0.16s steps(2, end),
+    box-shadow 0.16s steps(2, end),
+    translate var(--press-out) var(--press-out-ease);
+
+  &:hover {
+    border-color: var(--foam);
+    /* Nudged towards its own shadow, the way a key goes down. */
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 rgba(0, 4, 14, 0.55);
+  }
+}
+
+.card summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px clamp(16px, 2vw, 24px);
+  cursor: pointer;
+  /* Drop the native disclosure triangle in favour of the chevron below. */
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--foam);
+    outline-offset: -4px;
+  }
+}
+
+.card-q {
+  font-family: var(--pixel);
+  font-size: var(--fs-label);
+  line-height: 1.6;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #eaf4ff;
+  text-shadow: 0 0 12px rgba(47, 216, 216, 0.7);
+}
+
+.card-toggle {
+  flex: none;
+  width: 0;
+  height: 0;
+  margin-left: auto;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 9px solid var(--foam);
+}
+
+.card[open] .card-toggle {
+  transform: rotate(180deg);
+}
+
+/*
+ * The card is the control, not the summary strip inside it — the whole panel
+ * should go down when the question is clicked. So the press travel is moved off
+ * the summary and onto its card; see the press section in index.css.
+ */
+.card summary:active {
+  translate: none;
+}
+
+.card:has(summary:active) {
+  translate: 0 var(--press-drop);
+  transition-duration:
+    0.16s,
+    0.16s,
+    0.16s,
+    var(--press-in);
+  transition-timing-function:
+    steps(2, end),
+    steps(2, end),
+    steps(2, end),
+    var(--press-in-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:has(summary:active) {
+    translate: none;
+  }
+}
+
+.card-a {
+  margin: 0;
+  padding: 16px clamp(16px, 2vw, 24px) 20px;
+  border-top: 2px dashed rgba(47, 216, 216, 0.28);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.75;
+  color: var(--sea-ink);
+}
+
+/*
+ * Opening the card. `<details>` has nothing to animate by default — the answer
+ * is simply there or not — so the panel it is kept in gets a height to run
+ * from nothing up to its own, which needs `interpolate-size` in index.css for
+ * `auto` to be a value that can be travelled to.
+ *
+ * Browsers without `::details-content` drop this rule whole and the card opens
+ * at once, which is why the answer carries its own arrival below: that half
+ * works everywhere, and the two read as one movement where both run.
+ */
+.card::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 0.3s ease-out,
+    content-visibility 0.3s allow-discrete;
+}
+
+.card[open]::details-content {
+  block-size: auto;
+}
+
+/* Only a fade: the panel's own height is what moves the answer into place, and
+   travelling on top of that reads as the card opening upward into itself. */
+@keyframes card-drop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.card[open] .card-a {
+  animation: card-drop 0.3s ease-out both;
+}
+
+/* All of this is decoration — hold it still on request. */
+@media (prefers-reduced-motion: reduce) {
+  .deep-rays span,
+  .deep-bubbles span {
+    animation: none;
+  }
+
+  .deep-bubbles span {
+    opacity: 0.4;
+  }
+
+  /* The card still opens; it just stops travelling to get there. */
+  .card::details-content {
+    transition: none;
+  }
+
+  .card[open] .card-a {
+    animation: none;
+  }
+}

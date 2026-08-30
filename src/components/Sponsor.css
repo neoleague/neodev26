@@ -1,0 +1,477 @@
+/* ==========================================================================
+   Sponsor — a separate document, not a section of the title screen.
+
+   Same palette and the same two faces, but a different register: this page is
+   read by people deciding whether to spend money, so it is a single measured
+   column on the site's own background, with the neon pulled back to the title
+   and prose set at a comfortable measure.
+
+   The one thing carried over from the title screen's canvas is the sun, and
+   only the sun — no grid, no mountains, no sky. It sits behind the pitch as a
+   landmark, painted by `SunBackdrop`.
+
+   Type comes from the --fs-* steps only, --pixel for chrome and headings and
+   --sans for running prose — as everywhere else on the site.
+   ========================================================================== */
+
+.sponsor-page {
+  box-sizing: border-box;
+  min-height: 100svh;
+  padding-top: var(--masthead-h);
+  display: flex;
+  flex-direction: column;
+  /* The content stacks above the fixed sun behind it. */
+  position: relative;
+  isolation: isolate;
+}
+
+/* --------------------------------------------------------------------- sun
+
+   The title screen's disc, alone on the flat body colour. Fixed to the
+   viewport rather than to the page: it holds still in the middle of the
+   screen while the content scrolls over it, the way the canvas behaves on the
+   title screen. Nothing here moves — it is a still backdrop, not a parallax.
+   -------------------------------------------------------------------------- */
+
+.sponsor-sun {
+  position: fixed;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: min(680px, 78vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  /* Turned down: it is scenery behind prose, not the hero of the page. */
+  opacity: 0.5;
+}
+
+.sponsor-sun canvas {
+  display: block;
+}
+
+.sponsor-main {
+  /* Over the sun. */
+  position: relative;
+  z-index: 1;
+}
+
+.sponsor-main {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: clamp(28px, 6vh, 72px) clamp(20px, 4vw, 48px) clamp(48px, 8vh, 96px);
+}
+
+/* ---------------------------------------------------------------- the lede
+
+   Pitch on the left, one photograph on the right. The two columns are equal
+   and centred against each other, so the paragraph sits opposite the image
+   rather than above or below it.
+   -------------------------------------------------------------------------- */
+
+.sponsor-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(24px, 4vw, 56px);
+  padding: clamp(28px, 5vh, 56px) 0;
+  text-align: left;
+}
+
+.sponsor-title {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: var(--fs-display);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #fff;
+  /*
+   * The wordmark's neon, turned down. The title screen shouts; a page about
+   * budgets should be legible first and lit second.
+   */
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.55),
+    0 0 34px rgba(255, 106, 213, 0.6);
+}
+
+.sponsor-lede {
+  max-width: 62ch;
+  margin: 22px 0 0;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------------- bands
+
+   Every block below the hero is a `.sponsor-band`: a heading, then one row of
+   things. They are all the same distance apart so the page reads as a list of
+   sections rather than a stack of unrelated boxes.
+   -------------------------------------------------------------------------- */
+
+.sponsor-band {
+  margin-top: clamp(48px, 9vh, 104px);
+  text-align: left;
+}
+
+.sponsor-h2 {
+  margin: 0 0 clamp(20px, 3vh, 34px);
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: var(--fs-button);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 14px rgba(255, 106, 213, 0.75);
+}
+
+/* ------------------------------------------------------------ photo slots
+
+   Empty until there are photographs. The frame holds its aspect ratio while
+   it is bare, so dropping a real image in later does not move anything around
+   it. Same dashed placeholder furniture as the About section — this page
+   cannot import that stylesheet, so the rules are restated here.
+   -------------------------------------------------------------------------- */
+
+.sponsor-hero-photo,
+.sponsor-slot {
+  position: relative;
+  margin: 0;
+  padding: 12px 12px 14px;
+  background: linear-gradient(180deg, #fff 0%, #ffdff4 100%);
+  box-shadow: 0 18px 40px rgba(18, 2, 38, 0.55);
+}
+
+.sponsor-photo-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  /* The reel slots are square; the hero print is landscape. */
+  aspect-ratio: var(--ratio, 1);
+  border: 2px dashed rgba(255, 106, 213, 0.75);
+  background: repeating-linear-gradient(45deg, #2a0f47 0 10px, #351351 10px 20px);
+}
+
+.sponsor-hero-photo {
+  --ratio: 4 / 3;
+}
+
+.sponsor-photo-code {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  color: #45e5ff;
+  text-shadow: 0 0 8px rgba(69, 229, 255, 0.8);
+}
+
+.sponsor-photo-hint {
+  font-family: var(--pixel);
+  font-size: var(--fs-label);
+  letter-spacing: 0.3em;
+  color: #ff6ad5;
+  text-shadow: 0 0 12px rgba(255, 106, 213, 0.9);
+}
+
+/*
+ * A slot holding a real photograph drops the hatching behind it but keeps the
+ * dashed edge, so a filled slot and an empty one are framed the same. The
+ * picture is cropped to whatever ratio the slot was already holding.
+ */
+.sponsor-photo-frame.is-filled {
+  background: none;
+}
+
+.sponsor-photo-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ------------------------------------------------------------------- years
+
+   One block per year of the event: the headline count and the venue on one
+   side, that year's photographs on the other. `.year--flip`
+   swaps the two, so consecutive years read as a pair rather than as the same
+   block printed twice.
+   -------------------------------------------------------------------------- */
+
+.year-body {
+  display: grid;
+  /* The count needs only enough room for its numeral; the rest is photographs. */
+  grid-template-columns: minmax(200px, 0.7fr) 3fr;
+  align-items: center;
+  gap: clamp(20px, 3.5vw, 52px);
+}
+
+.year--flip .year-body {
+  grid-template-columns: 3fr minmax(200px, 0.7fr);
+}
+
+/* Photographs first on a flipped year — source order stays count-then-shots. */
+.year--flip .year-count {
+  order: 2;
+}
+
+/*
+ * The count, set the way the About section sets its stats: a lit numeral over
+ * a tracked-out label, hung off a neon rule.
+ */
+.year-count {
+  padding: 4px 0 4px 18px;
+  border-left: 2px solid #ff6ad5;
+
+  strong {
+    display: block;
+    font-family: var(--pixel);
+    font-weight: 400;
+    font-size: var(--fs-display);
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 0 0 16px rgba(255, 106, 213, 0.9);
+  }
+
+  span {
+    display: block;
+    margin-top: 12px;
+    font-family: var(--pixel);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #ffd9f4;
+  }
+}
+
+/*
+ * The venue. Its `Location` label is a bare span, so it picks up the tracked
+ * pixel label styling from `.year-count` above and sits over the address the
+ * way the unit sits over the count.
+ */
+.year-where {
+  max-width: 40ch;
+  margin: 22px 0 0;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/*
+ * As many columns as that year has photographs. Landscape rather than square:
+ * the photographs are camera shots, and a square crop cuts the room out of
+ * them.
+ */
+.year-shots .sponsor-photo-frame {
+  --ratio: 4 / 3;
+}
+
+.year-shots {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: clamp(12px, 1.8vw, 22px);
+}
+
+/* ------------------------------------------------------------------- tiers
+
+   Four cards in a row, cheapest first. Each carries its own metal as
+   `--metal`, and
+   everything coloured on it — the top edge, the name, the bullets — is drawn
+   from that one value, so a new tier only needs a colour.
+
+   The cards sit flat on the page: a border and a top edge, no bloom behind
+   them. The glow on this page is spent on type only.
+   -------------------------------------------------------------------------- */
+
+.tiers {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: stretch;
+  gap: clamp(14px, 1.8vw, 24px);
+  margin: 0;
+  padding: 0;
+}
+
+.tier {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: clamp(18px, 2vw, 26px);
+  /*
+   * Near-solid: the sun sits behind this page, and a card the reader has to
+   * read a price off should not have a gradient moving through it.
+   */
+  background: linear-gradient(
+    180deg,
+    rgba(52, 22, 92, 0.95) 0%,
+    rgba(33, 12, 63, 0.95) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--metal) 45%, transparent);
+  /* The metal's edge on top, and nothing behind the card. */
+  box-shadow: inset 0 3px 0 var(--metal);
+}
+
+.tier--bronze {
+  --metal: #d98b4a;
+}
+
+.tier--silver {
+  --metal: #c9d4e6;
+}
+
+.tier--gold {
+  --metal: #ffcc4d;
+}
+
+.tier--diamond {
+  --metal: #7ce8ff;
+}
+
+.tier-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tier-name {
+  margin: 0;
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: var(--fs-label);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--metal);
+}
+
+.tier-price {
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-stat);
+  line-height: 1.1;
+  color: #fff;
+}
+
+/* "Everything in Silver, plus:" — quieter than the perks it introduces. */
+.tier-inherits {
+  margin: -4px 0 -6px;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  font-style: italic;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--text) 75%, transparent);
+}
+
+.tier-perks {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--text);
+
+  li {
+    position: relative;
+    padding-left: 20px;
+  }
+
+  /* A small square bullet in the tier's metal — pixel furniture, not a disc. */
+  li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 7px;
+    height: 7px;
+    background: var(--metal);
+  }
+}
+
+/* ---------------------------------------------------------------- the foot
+
+   The way back to the title screen, closing the page off under a rule.
+   -------------------------------------------------------------------------- */
+
+.sponsor-foot {
+  margin-top: clamp(56px, 11vh, 128px);
+  padding-top: clamp(28px, 5vh, 48px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: left;
+}
+
+/*
+ * A real `<a href>`, so the shared press rule in index.css already moves it —
+ * `inline-flex` both puts the glyph beside the words and gives `translate`
+ * a box to move, which a plain inline box would not.
+ */
+.sponsor-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border: 2px solid rgba(255, 106, 213, 0.55);
+  font-family: var(--pixel);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text-h);
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+.sponsor-home-icon {
+  width: 16px;
+  height: 16px;
+  /* Sprite symbols ship dark; force them white, as the masthead's icons are. */
+  filter: brightness(0) invert(1);
+}
+
+/* ------------------------------------------------------------------ narrow */
+
+@media (max-width: 900px) {
+  .tiers {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Count over its photographs, whichever way round the year is. */
+  .year-body,
+  .year--flip .year-body {
+    grid-template-columns: 1fr;
+  }
+
+  .year--flip .year-count {
+    order: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Photograph under the pitch rather than beside it. */
+  .sponsor-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .tiers {
+    grid-template-columns: 1fr;
+  }
+}

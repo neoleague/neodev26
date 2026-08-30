@@ -1,0 +1,249 @@
+/* ==========================================================================
+   Contact — the cut-away.
+
+   The ground under the seabed the dive ends on, left bare: a survey grid over
+   the face and nothing else on it.
+
+   Type: steps come from the scale in index.css. --pixel is display type and UI
+   chrome, --sans is running prose. Nothing else.
+   ========================================================================== */
+
+#contact {
+  --ore: #ffd166;
+  --cut-cell: 64px;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  text-align: left;
+  padding: clamp(70px, 13vh, 150px) 0 clamp(70px, 12vh, 140px);
+  /* Land clear of the pinned masthead when the nav link jumps here. */
+  scroll-margin-top: 76px;
+  /*
+   * Ground. It opens on the seabed colour the FAQ closes on so the two
+   * sections meet without a line across them, then settles into the dark.
+   */
+  background: linear-gradient(180deg, #000814 0, #0d0620 34%, #13061f 100%);
+}
+
+/*
+ * The survey grid, laid flat over the whole face — this is a section drawing,
+ * not a view down a corridor, so the lines stay square rather than running to
+ * a vanishing point.
+ */
+.cut-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, rgba(209, 127, 255, 0.13) 0 1px, transparent 1px),
+    linear-gradient(180deg, rgba(209, 127, 255, 0.13) 0 1px, transparent 1px);
+  background-size: var(--cut-cell) var(--cut-cell);
+  /* Strongest at the top of the cut and gone by the bottom. */
+  -webkit-mask-image: linear-gradient(180deg, #000 0, transparent 88%);
+  mask-image: linear-gradient(180deg, #000 0, transparent 88%);
+}
+
+/* ------------------------------------------------------------ the content */
+
+.contact-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 56px);
+}
+
+.dig {
+  text-align: center;
+  margin-bottom: clamp(44px, 8vh, 96px);
+}
+
+.dig-title {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: var(--fs-display);
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+  /* The title screen's neon, struck in ore rather than water. */
+  color: #fff;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.85),
+    0 0 26px rgba(255, 209, 102, 0.85),
+    0 0 62px rgba(255, 106, 213, 0.6),
+    0 0 110px rgba(255, 209, 102, 0.4);
+}
+
+/*
+ * A terminal left running down here — the same bevelled furniture as the
+ * beach's about.txt, so the two read as machines out of the same decade. The
+ * chrome palette is shared, from index.css.
+ */
+.transmit {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  background: var(--chrome);
+  color: var(--chrome-ink);
+  /* Raised bevel, lit from the top-left the way every window of that era was. */
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-lit),
+    inset -2px -2px 0 var(--chrome-dark),
+    6px 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+.transmit-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 5px 6px 9px;
+  background: linear-gradient(90deg, #5c3110 0%, #b8791f 55%, #ffd166 100%);
+  color: #fff;
+  font-family: var(--pixel);
+  font-size: var(--fs-micro);
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.transmit-buttons {
+  display: flex;
+  gap: 3px;
+  margin-left: auto;
+
+  i {
+    display: grid;
+    place-items: center;
+    width: 19px;
+    height: 17px;
+    font-style: normal;
+    font-family: var(--pixel);
+    font-size: var(--fs-micro);
+    line-height: 1;
+    color: var(--chrome-ink);
+    background: var(--chrome);
+    box-shadow:
+      inset 1px 1px 0 var(--chrome-lit),
+      inset -1px -1px 0 var(--chrome-dark);
+  }
+}
+
+.geode-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 1.8vw, 20px);
+  margin: 6px 4px 4px;
+  padding: clamp(18px, 2.6vw, 30px);
+  background: var(--paper);
+  /* Sunken bevel — the mirror of the window's raised one. */
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-dark),
+    inset -2px -2px 0 var(--chrome-lit);
+}
+
+.geode-lead {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: var(--fs-label);
+  line-height: 1.7;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-ink);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+
+  span {
+    font-family: var(--pixel);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--paper-ink);
+  }
+
+  input,
+  textarea {
+    font-family: var(--sans);
+    font-size: var(--fs-body);
+    color: var(--paper-ink);
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+    padding: 11px 13px;
+    resize: vertical;
+    /* Sunk into the panel, the way fields were. */
+    box-shadow:
+      inset 2px 2px 0 var(--chrome-dark),
+      inset -2px -2px 0 var(--chrome-lit);
+
+    &:focus {
+      outline: 2px solid var(--ore);
+      outline-offset: -2px;
+    }
+  }
+}
+
+.field--wide {
+  grid-column: 1 / -1;
+}
+
+.geode-send {
+  grid-column: 1 / -1;
+  justify-self: start;
+  margin-top: 2px;
+  padding: 14px 32px;
+  font-family: var(--pixel);
+  font-size: var(--fs-button);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--chrome-ink);
+  cursor: pointer;
+  border: 0;
+  background: var(--chrome);
+  box-shadow:
+    inset 2px 2px 0 var(--chrome-lit),
+    inset -2px -2px 0 var(--chrome-dark);
+
+  /* Hover strikes the vein: the ore colours in order, top to bottom. */
+  &:hover,
+  &:focus-visible {
+    color: #fff;
+    background: linear-gradient(
+      180deg,
+      #ffd166 0%,
+      #ff9f45 30%,
+      #ff6ad5 65%,
+      #c13bd6 100%
+    );
+  }
+
+  /* And goes in when pressed, because that is what these did. */
+  &:active {
+    box-shadow:
+      inset 2px 2px 0 var(--chrome-dark),
+      inset -2px -2px 0 var(--chrome-lit);
+  }
+}
+
+/* ------------------------------------------------------------------ mobile */
+
+@media (max-width: 780px) {
+  .geode-form {
+    grid-template-columns: 1fr;
+  }
+
+  .geode-send {
+    justify-self: stretch;
+    text-align: center;
+  }
+}

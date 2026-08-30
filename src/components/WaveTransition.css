@@ -1,0 +1,86 @@
+/* ==========================================================================
+   The wave sweep between the beach and the sea.
+
+   `.tide` is a zero-height marker sitting between the two sections. The stage
+   above it carries the wave, moved by `transform` alone from the rAF loop in
+   WaveTransition.jsx.
+
+   The sea the wave uncovers is not painted here — it is the FAQ itself, held
+   out of flow and revealed as the wave passes. See `.tide-held` below.
+   ========================================================================== */
+
+.tide {
+  height: 0;
+}
+
+/*
+ * Left rendered rather than toggled with `visibility`. At rest both layers sit
+ * off screen, so there is nothing to see either way — but promoting a 1254px
+ * image on the first frame of the sweep is a stutter exactly where it would be
+ * most obvious.
+ */
+.tide-stage {
+  position: fixed;
+  inset: 0;
+  /* Above the held FAQ, below the masthead, so the nav stays reachable. */
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/*
+ * Everything below the wave, waiting behind it: lifted out of the document so
+ * the page ends at the beach, pinned to the top of the screen, and clipped
+ * away from the right. `--reveal` is how much is still covered, driven per
+ * frame.
+ *
+ * Height is deliberately left alone. Pinning it with `inset: 0` would crop it
+ * to one screen and drag the seabed up into view; at its natural height it
+ * lays out exactly as it will once released, which is what lets the hand-back
+ * be invisible.
+ */
+.depths.tide-held {
+  position: fixed;
+  /* The sub-pixel offset that lines this up with where it lands — see
+     `measure` in WaveTransition.jsx. */
+  top: var(--hold-top, 0px);
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  clip-path: inset(0 var(--reveal, 100%) 0 0);
+  will-change: clip-path;
+}
+
+.tide-wave {
+  position: absolute;
+  left: 0;
+  /* Sized and hung from JS — the waterline maths depends on both, so one place
+     owns them. See WALL and CROP_TOP in WaveTransition.jsx. */
+  will-change: transform;
+
+  /* The trailing side dissolves into the sea it has already uncovered, so the
+     wave and the water behind it read as one body. */
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 2%,
+    rgba(0, 0, 0, 0.5) 20%,
+    #000 40%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 2%,
+    rgba(0, 0, 0, 0.5) 20%,
+    #000 40%
+  );
+}
+
+/*
+ * Taking over someone's scrolling is exactly the kind of motion this setting
+ * asks us not to make. The section is never held, so the page stays an
+ * ordinary one: the beach scrolls into the sea and the wave never appears.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .tide-stage {
+    display: none;
+  }
+}

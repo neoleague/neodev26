@@ -1,0 +1,119 @@
+/* ==========================================================================
+   The page's scrollbar.
+
+   The native one is hidden — not because it is ugly, but because it cannot
+   describe this page (see Scrollbar.jsx). This is its replacement, and the
+   only one there is, so it is always on screen and never fades out.
+   ========================================================================== */
+
+/*
+ * Hidden, not disabled: the document still scrolls exactly as it did, there is
+ * simply nothing drawn in the gutter. `scrollbar-width` covers Firefox and
+ * modern Chrome; the pseudo-element covers the rest of WebKit.
+ */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.rail {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 11px;
+  /* Above the wave's stage and the masthead — the reader must be able to get
+     hold of it at every point in the crossing. */
+  z-index: 6;
+  box-sizing: border-box;
+  cursor: pointer;
+  /* The rail is a control, not a reading surface. */
+  user-select: none;
+  touch-action: none;
+
+  /* No channel behind the thumb — the page shows through the gutter. */
+  background: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  /* Nothing to scroll yet — before the first measurement, or on a short page. */
+  &[data-idle='true'] {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/*
+ * The thumb, and the whole of the scrollbar there is. One flat fill of the
+ * site's accent — square corners, no ramp, no bevel, no glow. The only mark on
+ * it is the grip.
+ */
+.rail-thumb {
+  position: absolute;
+  /*
+   * The full width of the rail, with no inset. Anything the thumb does not
+   * cover is track, and track jumps rather than drags — a margin down either
+   * side reads as part of the bar but cannot be picked up, and the cursor
+   * changes as the pointer crosses onto it.
+   */
+  left: 0;
+  right: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  background: var(--accent);
+  /*
+   * Position comes from `transform` and is set per frame from the rAF sample,
+   * so it stays on the compositor while the wave is sweeping.
+   */
+  will-change: transform;
+}
+
+/* Three notches, the way a grip is drawn on a pixel-art slider. */
+.rail-grip {
+  width: 3px;
+  height: 6px;
+  background: linear-gradient(
+    180deg,
+    rgba(42, 10, 61, 0.7) 0 2px,
+    rgba(0, 0, 0, 0) 2px 4px,
+    rgba(42, 10, 61, 0.7) 4px 6px
+  );
+}
+
+/* Nothing to grip on a stub of a thumb — it would fill the whole face. */
+.rail-thumb[data-short='true'] .rail-grip {
+  display: none;
+}
+
+/* Feedback without a glow: the fill itself lifts, and stays the one colour. */
+.rail:hover .rail-thumb,
+.rail:focus-visible .rail-thumb,
+.rail[data-dragging='true'] .rail-thumb {
+  filter: brightness(1.2);
+}
+
+.rail[data-dragging='true'],
+.rail[data-dragging='true'] .rail-thumb {
+  cursor: grabbing;
+}
+
+/*
+ * Touch scrolls by dragging the page itself and draws no scrollbar of its own,
+ * so a rail here would be a 14px strip of the screen given over to nothing.
+ */
+@media (pointer: coarse) {
+  .rail {
+    display: none;
+  }
+}
