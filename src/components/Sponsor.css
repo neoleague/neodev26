@@ -6,7 +6,7 @@
    column on the site's own background, with the neon pulled back to the title
    and prose set at a comfortable measure.
 
-   The one thing carried over from the title screen's canvas is the sun, and
+   The one thing carried over from the title screen's scene is the sun, and
    only the sun — no grid, no mountains, no sky. It sits behind the pitch as a
    landmark, painted by `SunBackdrop`.
 
@@ -29,7 +29,7 @@
 
    The title screen's disc, alone on the flat body colour. Fixed to the
    viewport rather than to the page: it holds still in the middle of the
-   screen while the content scrolls over it, the way the canvas behaves on the
+   screen while the content scrolls over it, the way the backdrop behaves on the
    title screen. Nothing here moves — it is a still backdrop, not a parallax.
    -------------------------------------------------------------------------- */
 

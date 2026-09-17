@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { DEFAULT_COLORS, renderSun } from './SynthwaveBackground'
+import { DEFAULT_COLORS, renderSun } from '../scene/sun.js'
 
 /**
  * The banded sun from the title screen's background, and nothing else from it

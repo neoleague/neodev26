@@ -80,13 +80,38 @@ export default function Scrollbar() {
     window.addEventListener('scroll', request, { passive: true })
     window.addEventListener('resize', request)
 
-    // The about section settles as its fonts and images land, which changes
-    // how long the page is — the wave watches for this too.
-    const observer = new ResizeObserver(request)
+    /*
+     * The page getting longer or shorter, coalesced.
+     *
+     * This is here because the about section settles as its fonts and images
+     * land — the wave watches for the same thing. But the page also changes
+     * length on every frame of an animation that moves anything below it, and
+     * a FAQ card opening is exactly that: `block-size` runs from 0 to the
+     * answer's height, so the body resizes eighteen times in 0.3s.
+     *
+     * Answering each of those cost the frame twice over — `read()` takes
+     * `scrollHeight`, which forces layout from inside a rAF callback, and the
+     * new `length` then re-rendered the rail. Both landed in the middle of the
+     * card's own layout pass, which is what made that slide the roughest
+     * movement on the site.
+     *
+     * A settling signal does not need to be answered at animation frequency.
+     * The rail picks up the new length once the page has stopped changing, a
+     * tenth of a second later than it used to, which is not a thing a reader
+     * can see — the thumb's *position* is untouched by this and still tracks
+     * scrolling frame by frame, through `subscribe` and the scroll listener
+     * above.
+     */
+    let settle = 0
+    const observer = new ResizeObserver(() => {
+      clearTimeout(settle)
+      settle = setTimeout(request, 100)
+    })
     observer.observe(document.body)
 
     return () => {
       cancelAnimationFrame(frame)
+      clearTimeout(settle)
       unsubscribe()
       observer.disconnect()
       window.removeEventListener('scroll', request)

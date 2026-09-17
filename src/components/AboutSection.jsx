@@ -1,13 +1,15 @@
-import photoOne from '../assets/2024/2024-3.jpg'
-import photoFour from '../assets/2024/2024-4.jpg'
+import photoOne from '../assets/2024/2024-3.webp'
+import photoTwo from '../assets/2025/2025-1.webp'
+import photoThree from '../assets/2025/2025-2.webp'
+import photoFour from '../assets/2024/2024-4.webp'
 import PalmTree from './PalmTree'
 import usePopIn from './usePopIn'
 import './About.css'
 
-/** Placeholder copy — swap once the real about text is written. */
+/** The about window's copy — one string per paragraph. */
 const BRIEF = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-  'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+  'With AI constantly improving, hackathons have become less about collaboration and more about who can crank out the most code the fastest.',
+  'We run differently from a normal hackathon. Big teams of ten, school versus school, and live pitching in front of judges and an audience. Neodev places a focus on collaboration and team dynamics.',
 ]
 
 /** The three figures the front page leads with. */
@@ -24,8 +26,8 @@ const STATS = [
  */
 const PHOTOS = [
   { area: 'one', ratio: '4 / 3', src: photoOne, alt: 'Neodev 2024' },
-  { area: 'two', ratio: '1 / 1', code: 'IMG_02' },
-  { area: 'three', ratio: '3 / 4', code: 'IMG_03' },
+  { area: 'two', ratio: '1 / 1', src: photoTwo, alt: 'Neodev 2025' },
+  { area: 'three', ratio: '3 / 4', src: photoThree, alt: 'Neodev 2025' },
   { area: 'four', ratio: '16 / 9', src: photoFour, alt: 'Neodev 2024' },
 ]
 

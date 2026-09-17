@@ -1,6 +1,8 @@
-import shot1 from '../assets/2024/2024-1.JPG'
-import shot2 from '../assets/2024/2024-2.JPG'
-import shot5 from '../assets/2024/2024-5.jpg'
+import shot1 from '../assets/2024/2024-1.webp'
+import shot2 from '../assets/2024/2024-2.webp'
+import heroShot from '../assets/2024/2024-5.webp'
+import shot2025a from '../assets/2025/2025-3.webp'
+import shot2025b from '../assets/2025/2025-4.webp'
 import Masthead from './Masthead'
 import SunBackdrop from './SunBackdrop'
 import './Sponsor.css'
@@ -11,9 +13,9 @@ import './Sponsor.css'
  * photograph, then goes straight to the packages — the two things a sponsor
  * came for, above the fold and in that order.
  *
- * The lede, the packages and the two years are real, and 2024 has its
- * photographs. The empty slots left on 2025 are the only PLACEHOLDER — they
- * hold their shape so a picture drops straight in.
+ * Everything on it is real — the lede, the packages, both years and every
+ * photograph. `PhotoSlot` still draws an empty frame for a shot without a
+ * `src`, so one can be added back without moving anything around it.
  */
 
 const LEDE =
@@ -65,9 +67,9 @@ const TIERS = [
 /*
  * The years, most recent first. Each is the same three parts — a count, a
  * line about the year, and its photographs — but they are not the same block
- * twice: the current year turns around — photographs first, count last, and
- * fewer of them — while the year before it leads with its count and carries
- * the wider set of shots.
+ * twice: the current year turns around — photographs first, count last —
+ * while the year before it leads with its count. `.year-shots` takes as many
+ * columns as that year has photographs, so a year may carry any number.
  */
 const YEARS = [
   {
@@ -75,14 +77,14 @@ const YEARS = [
     count: '80+',
     unit: 'Hackers',
     where: 'Accelerator Centre, University of Waterloo',
-    shots: [{ code: 'IMG-01' }, { code: 'IMG-02' }],
+    shots: [{ src: shot2025a }, { src: shot2025b }],
   },
   {
     year: '2024',
     count: '70+',
     unit: 'Participants',
     where: 'Den 1880, Waterloo',
-    shots: [{ src: shot1 }, { src: shot2 }, { src: shot5 }],
+    shots: [{ src: shot1 }, { src: shot2 }],
   },
 ]
 
@@ -154,7 +156,7 @@ function Year({ year, count, unit, where, shots, flip }) {
 export default function SponsorPage() {
   return (
     <>
-      <Masthead base="/" />
+      <Masthead page="sponsor" />
 
       <div className="sponsor-page">
         {/* The title screen's sun, on its own behind the pitch. */}
@@ -168,7 +170,11 @@ export default function SponsorPage() {
               <p className="sponsor-lede">{LEDE}</p>
             </div>
 
-            <PhotoSlot className="sponsor-hero-photo" code="IMG-00" />
+            <PhotoSlot
+              className="sponsor-hero-photo"
+              src={heroShot}
+              alt="Neodev 2024"
+            />
           </header>
 
           {/* -------------------------------------------------- the packages */}

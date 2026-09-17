@@ -1,12 +1,5 @@
-.page-background {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
 /*
- * Keep the page content above the background canvas. Named explicitly rather
+ * Keep the page content above the hero backdrop. Named explicitly rather
  * than as `#root > *`, so the layers that position themselves — the fixed
  * masthead, the scanline overlay — keep the positioning they ask for.
  */
@@ -379,7 +372,12 @@
   }
 }
 
-.signup {
+/*
+ * The hero's call to action. Named for what it does: it is the one control on
+ * the title screen that leaves it, for the sponsor page. Everything else that
+ * looks like a link here scrolls.
+ */
+.sponsor-cta {
   margin-top: 12px;
   font-family: var(--pixel);
   font-size: var(--fs-button);
@@ -387,9 +385,17 @@
   text-transform: uppercase;
   text-decoration: none;
   color: #2a0a3d;
-  background: linear-gradient(180deg, #fff 0%, #ffd9f4 100%);
   padding: 18px 34px;
   border: 2px solid #fff;
+
+  /*
+   * At rest the fill leans the way the sun does — white at the top, through
+   * pink, to the faintest lilac at the bottom. It is the hover ramp said
+   * quietly: the same journey from warm to violet, three stops instead of
+   * five and almost out of ink, so the button has somewhere to travel to
+   * under the pointer rather than being swapped for a different one.
+   */
+  background: linear-gradient(180deg, #fff 0%, #ffdcf3 62%, #f3cdf0 100%);
   box-shadow:
     0 0 18px rgba(255, 106, 213, 0.75),
     0 0 60px rgba(255, 106, 213, 0.45);

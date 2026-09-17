@@ -54,6 +54,20 @@
   flex-wrap: wrap;
   justify-content: center;
 
+  /*
+   * A contact shadow under everything in the bar, inherited by the links and
+   * by the dashes between them.
+   *
+   * The masthead is fixed over the whole site and has no bar behind it, which
+   * was free while every section under it was night. The FAQ's water is the
+   * brightest surface on the site, and white type with a pink bloom simply
+   * vanishes on it. This is the cheapest thing that reads on both: over the
+   * hero it is invisible against the dark, over the reef it is what holds the
+   * letters together. A scrim would have worked too, but the bar floating free
+   * of any panel is the point of it.
+   */
+  text-shadow: 0 2px 6px rgba(9, 16, 48, 0.75);
+
   /* The dash separators from the reference layout. */
   li + li::before {
     content: '–';
@@ -74,12 +88,17 @@
     text-transform: uppercase;
     color: var(--text-h);
     text-decoration: none;
-    text-shadow: 0 0 10px var(--accent-soft);
+    /* The bloom, over the contact shadow inherited from `.nav-links`. */
+    text-shadow:
+      0 0 10px var(--accent-soft),
+      0 2px 6px rgba(9, 16, 48, 0.75);
 
     &:hover,
     &:focus-visible {
       color: var(--accent);
-      text-shadow: 0 0 14px var(--accent);
+      text-shadow:
+        0 0 14px var(--accent),
+        0 2px 6px rgba(9, 16, 48, 0.75);
     }
   }
 
@@ -116,7 +135,9 @@
 .social-icon {
   width: 20px;
   height: 20px;
-  /* Sprite symbols ship dark; force them white whatever their source fill. */
-  filter: brightness(0) invert(1) drop-shadow(0 0 6px var(--accent-soft));
+  /* Sprite symbols ship dark; force them white whatever their source fill. The
+     second shadow is the icons' share of the note on `.nav-links` above. */
+  filter: brightness(0) invert(1) drop-shadow(0 0 6px var(--accent-soft))
+    drop-shadow(0 2px 4px rgba(9, 16, 48, 0.7));
 }
 

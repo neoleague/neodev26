@@ -99,7 +99,14 @@
 .beach-ocean::after {
   content: '';
   position: absolute;
-  inset: -100% 0;
+  /*
+   * Only as much overhang as the drift below actually travels. The stripes
+   * repeat every 8px, so a taller sheet draws the identical pattern — this
+   * used to be `-100% 0`, which is three times the ocean's height of 1px-period
+   * gradient rasterized into a composited layer, all but a sliver of it behind
+   * `overflow: hidden`.
+   */
+  inset: -12px 0;
   background: repeating-linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.32) 0 1px,
@@ -155,8 +162,25 @@
   overflow: visible;
   /* Root the trunk at the shoreline, then push it down the sand by --root. */
   top: calc(var(--sky-h) + var(--sea-h) + var(--root) - var(--palm-h));
-  filter: drop-shadow(0 0 12px rgba(255, 106, 213, 0.4));
 }
+
+/*
+ * No filter on this element, and none on anything above the sway.
+ *
+ * It carried `drop-shadow(0 0 12px rgba(255, 106, 213, 0.4))`, a faint pink
+ * halo, and that one declaration was the most expensive thing on the page. A
+ * filtered subtree cannot be cached while its contents move: `.palm-lean` and
+ * `.palm-fronds` animate forever, so every frame re-rendered the tree and then
+ * recomputed a 12px blur over the whole of it, four trees at once, on the main
+ * thread. The halo was barely legible against a sunset sky the palms are
+ * already stroked out against.
+ *
+ * If it is ever wanted back, the cheap way is to give the whole `<svg>` a
+ * single lean of its own instead of the two inner groups — one filtered layer
+ * that only ever gets transformed can be rasterized once and moved by the
+ * compositor. That trades the two-phase sway for the glow; this trades the
+ * glow for the sway.
+ */
 
 .palm-trunk {
   fill: var(--beach-ink);
@@ -349,19 +373,57 @@
   padding: 12px 12px 14px;
   transform: rotate(var(--tilt));
   background: linear-gradient(180deg, #fff 0%, #ffdff4 100%);
-  box-shadow:
-    0 18px 40px rgba(18, 2, 38, 0.6),
-    0 0 26px rgba(255, 106, 213, 0.35);
-  transition:
-    transform 0.35s ease,
-    box-shadow 0.35s ease;
+  transition: transform 0.35s ease;
 
   &:hover {
     transform: rotate(0deg) translateY(-8px) scale(1.03);
-    box-shadow:
-      0 26px 54px rgba(18, 2, 38, 0.7),
-      0 0 44px rgba(255, 106, 213, 0.65);
   }
+
+  &:hover::before {
+    opacity: 0;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+/*
+ * Both of the print's shadows, resting and lifted, cross-faded on hover.
+ *
+ * They used to be one `box-shadow` transitioned into the other, and a
+ * box-shadow is not a property the compositor can animate: every frame of that
+ * 0.35s repainted the print and the 54px of blur around it. Two boxes that are
+ * each painted once and then only faded is the same picture for the cost of an
+ * opacity.
+ *
+ * Pulled out by the print's own padding so their edges are the print's edges.
+ * An outer shadow never paints inside the box casting it, so neither of these
+ * lands on the white border despite sitting over it in paint order; the
+ * negative `z-index` is what keeps them under the strips of tape.
+ */
+.photo::before,
+.photo::after {
+  content: '';
+  position: absolute;
+  inset: -12px -12px -14px;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.photo::before {
+  opacity: 1;
+  box-shadow:
+    0 18px 40px rgba(18, 2, 38, 0.6),
+    0 0 26px rgba(255, 106, 213, 0.35);
+}
+
+.photo::after {
+  opacity: 0;
+  box-shadow:
+    0 26px 54px rgba(18, 2, 38, 0.7),
+    0 0 44px rgba(255, 106, 213, 0.65);
 }
 
 .photo-frame {
@@ -419,7 +481,12 @@
   background: rgba(255, 255, 255, 0.32);
   border-left: 1px solid rgba(255, 255, 255, 0.5);
   border-right: 1px solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(1px);
+  /*
+   * No `backdrop-filter: blur(1px)` here. Eight of these, each rotated, each
+   * asking the compositor to snapshot and blur what is behind it whenever any
+   * of it moves — and a one-pixel blur under a 32%-white strip is not
+   * something a reader can see. The translucency is doing all the work.
+   */
 }
 
 .photo-tape--l {
@@ -739,14 +806,36 @@
   aspect-ratio: 16 / 9;
   border: 2px dashed rgba(69, 229, 255, 0.6);
   background: repeating-linear-gradient(45deg, #2a0f47 0 10px, #351351 10px 20px);
-  transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+  transition: border-color 0.25s ease;
 
   &:hover {
     border-color: #ff6ad5;
-    box-shadow: 0 0 26px rgba(255, 106, 213, 0.55);
   }
+
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+/*
+ * The hover glow, faded rather than grown, for the same reason as the prints
+ * above — and here it matters more than it looks: these sit inside `.reel-strip`,
+ * which the tape animation has handed to the compositor as one very wide layer.
+ * Repainting a box-shadow on any slot inside it means repainting that whole
+ * layer, mid-animation, for a quarter of a second.
+ *
+ * Absolutely positioned, so it is not a grid item and `place-items: center`
+ * goes on centring the code and the hint. Pulled out by the border so it casts
+ * from the slot's edge.
+ */
+.reel-slot::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 0 26px rgba(255, 106, 213, 0.55);
+  transition: opacity 0.25s ease;
 }
 
 /* ------------------------------------------------------------------ mobile */

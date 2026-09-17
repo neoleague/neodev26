@@ -8,8 +8,8 @@ export default defineConfig({
   build: {
     /*
      * Two documents, not one app with a router. The sponsor page shares the
-     * palette, the masthead and the background canvas, but none of the title
-     * screen's machinery — no wave transition, no virtual scroll axis — so it
+     * palette, the masthead and the sun, but none of the title screen's
+     * machinery — no wave transition, no virtual scroll axis — so it
      * is cheaper and simpler as its own entry than as a route inside App.
      */
     rollupOptions: {

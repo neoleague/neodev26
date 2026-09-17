@@ -3,17 +3,47 @@
 
    The wave sweep above hands the reader over already underwater, so this
    section opens straight into the sea. The questions run straight down one
-   column while the water darkens toward the seabed. Its palette is sampled
-   from wave.webp so the sea reads as the same water the wave was.
+   column, from the waterline at the top to the sand at the bottom, with the
+   reef in components/Seafloor.jsx standing behind them.
+
+   Every colour comes from the depths block in index.css. The water is bright,
+   so the panels are the dark thing on the page rather than the lit one — this
+   section reads as ink on water, not neon on night.
 
    Type: steps come from the scale in index.css. --pixel is display type and UI
    chrome, --sans is running prose. Nothing else.
    ========================================================================== */
 
 #faq {
-  --foam: #2fd8d8;
-  --sea-line: rgba(47, 216, 216, 0.42);
-  --sea-ink: #d3d0f0;
+  /*
+   * How a card opens. The curve leaves quickly and arrives almost flat, so the
+   * last frames of the slide cover very little ground — which is where a
+   * dropped frame would otherwise be most obvious, and why this reads as
+   * settling rather than stopping. The answer's fade is on the same pair, so
+   * the two stay one movement.
+   */
+  --card-open: 0.34s;
+  --card-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /*
+   * How a card answers the pointer. Smooth, deliberately — the rest of the
+   * site cuts between states in `steps()` (the wordmark's glitch in App.css is
+   * the loudest example, on `steps(1, end)`), and this used to as well, at
+   * `steps(2, end)`. Two hard jumps 80ms apart is the right language for a
+   * readout panel blinking, but not for something that answers the mouse
+   * wherever it happens to cross: read as movement rather than as a signal,
+   * two frames is just a stutter. The press keeps its own spring below.
+   */
+  --card-hover: 0.16s;
+  --card-hover-ease: ease-out;
+
+  /*
+   * Everything this section is coloured with now comes from the depths block
+   * in index.css. What is left here is the two roles that are the FAQ's own:
+   * the edge on a panel, and the prose inside one.
+   */
+  --sea-line: rgba(47, 211, 240, 0.45);
+  --sea-ink: #cfe6ff;
 
   position: relative;
   isolation: isolate;
@@ -32,114 +62,32 @@
   scroll-margin-top: 76px;
 
   /*
-   * The same water the wave sweep leaves behind, painted from the same top
-   * edge — the sweep ends by putting this element's top exactly where the
-   * overlay was, so the handover shows nothing. Defined in index.css.
+   * The water the wave sweep leaves behind, painted from this element's own
+   * top edge — the sweep ends by putting it exactly where the overlay was, so
+   * the handover shows nothing.
+   *
+   * A gradient rather than the photograph this used to be. The reef in
+   * Seafloor.jsx is the scene now, and it is drawn; a photographic plate
+   * behind a drawing read as two pictures. It also cost 154 KB and a
+   * `background-attachment: fixed`, which cannot be scrolled by the
+   * compositor.
+   *
+   * Stops are in px so they measure from the top however tall the section
+   * grows: open every card and the extra height is added to the deep water in
+   * the middle, which is where nothing is happening, rather than stretching
+   * the surface away from the waterline.
    */
-  background: var(--sea-column), var(--sea-image);
-  background-color: var(--sea-floor);
-}
-
-/* ------------------------------------------------------------- the water */
-
-.deep {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Light shafts angling down from the surface. */
-.deep-rays span {
-  position: absolute;
-  top: 0;
-  height: min(1400px, 85%);
-  transform: rotate(var(--tilt));
-  transform-origin: top center;
   background: linear-gradient(
     180deg,
-    rgba(186, 232, 255, 0) 0%,
-    rgba(186, 232, 255, 0.2) 34%,
-    rgba(186, 232, 255, 0.07) 62%,
-    rgba(186, 232, 255, 0) 88%
+    var(--sea-surface) 0,
+    var(--sea-shallow) 120px,
+    var(--sea-bright) 340px,
+    var(--sea-mid) 560px,
+    var(--sea-far) 1100px,
+    var(--sea-dusk) 1500px,
+    var(--sea-shore) 1800px
   );
-  /* Without this the shafts read as flat translucent bars. */
-  mask-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    #000 38%,
-    #000 62%,
-    transparent 100%
-  );
-  filter: blur(16px);
-  animation: ray-breathe 9s ease-in-out infinite alternate;
-}
-
-@keyframes ray-breathe {
-  from {
-    opacity: 0.45;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* The sprite fills the span; the span only carries position and motion. */
-.deep-bubbles span {
-  position: absolute;
-  bottom: -80px;
-  color: rgba(186, 232, 255, 0.9);
-  animation-name: bubble-rise;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-
-.pixel-bubble {
-  display: block;
-  width: 100%;
-  height: 100%;
-  /* Keeps the pixels square when the browser scales the sprite up. */
-  image-rendering: pixelated;
-}
-
-@keyframes bubble-rise {
-  0% {
-    transform: translate(0, 0) scale(0.7);
-    opacity: 0;
-  }
-  12% {
-    opacity: 0.85;
-  }
-  88% {
-    opacity: 0.5;
-  }
-  100% {
-    transform: translate(var(--drift), -125vh) scale(1.15);
-    opacity: 0;
-  }
-}
-
-.seabed {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: clamp(120px, 15vw, 220px);
-}
-
-.seabed-far {
-  fill: #021230;
-  stroke: rgba(47, 216, 216, 0.22);
-  stroke-width: 2;
-}
-
-/* Hard steps, no anti-aliasing — see the ridge maths in FaqSection.jsx. */
-.seabed {
-  shape-rendering: crispedges;
-}
-
-.seabed-near {
-  fill: #000610;
+  background-color: var(--sea-shore);
 }
 
 /* ------------------------------------------------------------- the content */
@@ -165,14 +113,18 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 0;
-  /* The title screen's neon, in the wave's own colours — cyan off its streaks,
-     pink off its foam. */
-  color: #fff;
+  /*
+   * Ink, not neon. Everywhere else on the site the background is night and the
+   * type is the lit thing on it; here the water is the brightest surface on
+   * the page, and a white glow on it is simply gone. So the title is cut out
+   * of the water in the darkest colour down here, lifted off it by a hard
+   * white edge underneath — the same trick a sticker uses, and in keeping with
+   * a section whose panels are all flat fills and hard shadows.
+   */
+  color: var(--ink-lit);
   text-shadow:
-    0 0 8px rgba(255, 255, 255, 0.85),
-    0 0 26px rgba(47, 216, 216, 0.9),
-    0 0 60px rgba(240, 176, 224, 0.6),
-    0 0 110px rgba(47, 216, 216, 0.5);
+    0 2px 0 rgba(255, 255, 255, 0.55),
+    0 0 26px rgba(255, 255, 255, 0.35);
 }
 
 /* ------------------------------------------------------------- the descent */
@@ -204,28 +156,39 @@
  * A readout panel, not a pane of glass: flat fill, a hard two pixel edge and a
  * solid unblurred shadow dropped behind it — the same language as the beach's
  * taped photographs and its bevelled window, in the water's colours.
+ *
+ * `--ink` is the darkest colour in the reef behind it, so the panels read as
+ * cut from the same scene rather than laid on top of it.
  */
 .card {
+  /*
+   * Each card's insides are its own problem. Opening one changes the height of
+   * the list and moves every card under it; without this the browser has to
+   * consider whether their contents need laying out again too, on every frame
+   * of the slide. It only contains layout — the shadow still falls outside.
+   */
+  contain: layout;
+
   background:
     repeating-linear-gradient(
       45deg,
-      rgba(47, 216, 216, 0.045) 0 7px,
+      rgba(47, 211, 240, 0.05) 0 7px,
       rgba(0, 0, 0, 0) 7px 14px
     ),
-    linear-gradient(180deg, #012456 0%, #001435 100%);
+    linear-gradient(180deg, var(--ink-lit) 0%, var(--ink) 100%);
   border: 2px solid var(--sea-line);
-  box-shadow: 5px 5px 0 rgba(0, 4, 14, 0.55);
+  box-shadow: 5px 5px 0 var(--ink-line);
   transition:
-    border-color 0.16s steps(2, end),
-    transform 0.16s steps(2, end),
-    box-shadow 0.16s steps(2, end),
+    border-color var(--card-hover) var(--card-hover-ease),
+    transform var(--card-hover) var(--card-hover-ease),
+    box-shadow var(--card-hover) var(--card-hover-ease),
     translate var(--press-out) var(--press-out-ease);
 
   &:hover {
     border-color: var(--foam);
     /* Nudged towards its own shadow, the way a key goes down. */
     transform: translate(2px, 2px);
-    box-shadow: 3px 3px 0 rgba(0, 4, 14, 0.55);
+    box-shadow: 3px 3px 0 var(--ink-line);
   }
 }
 
@@ -254,8 +217,8 @@
   line-height: 1.6;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #eaf4ff;
-  text-shadow: 0 0 12px rgba(47, 216, 216, 0.7);
+  color: var(--foam-pale);
+  text-shadow: 0 0 12px rgba(47, 211, 240, 0.55);
 }
 
 .card-toggle {
@@ -283,15 +246,16 @@
 
 .card:has(summary:active) {
   translate: 0 var(--press-drop);
+  /* Positional: these four track the four in `.card`'s own `transition`. */
   transition-duration:
-    0.16s,
-    0.16s,
-    0.16s,
+    var(--card-hover),
+    var(--card-hover),
+    var(--card-hover),
     var(--press-in);
   transition-timing-function:
-    steps(2, end),
-    steps(2, end),
-    steps(2, end),
+    var(--card-hover-ease),
+    var(--card-hover-ease),
+    var(--card-hover-ease),
     var(--press-in-ease);
 }
 
@@ -304,7 +268,7 @@
 .card-a {
   margin: 0;
   padding: 16px clamp(16px, 2vw, 24px) 20px;
-  border-top: 2px dashed rgba(47, 216, 216, 0.28);
+  border-top: 2px dashed rgba(47, 211, 240, 0.3);
   font-family: var(--sans);
   font-size: var(--fs-body);
   line-height: 1.75;
@@ -320,13 +284,29 @@
  * Browsers without `::details-content` drop this rule whole and the card opens
  * at once, which is why the answer carries its own arrival below: that half
  * works everywhere, and the two read as one movement where both run.
+ *
+ * A height is a layout property, so this one cannot be handed to the
+ * compositor the way the rest of the site's motion is — every frame of it
+ * relays the list, the section and the page below. That is inherent to an
+ * accordion: the cards underneath genuinely do have to move. What it means is
+ * that the cost of a frame has to be kept down elsewhere, which is why the two
+ * `ResizeObserver`s watching `document.body` — in Scrollbar.jsx and
+ * WaveTransition.jsx — no longer answer a page-length change at animation
+ * frequency. Between them they were spending two forced layouts and a React
+ * render on every frame of this.
  */
 .card::details-content {
   block-size: 0;
   overflow: hidden;
+  /*
+   * The answer's own layout is settled before the slide starts — its width
+   * never changes — so this box only needs to grow and clip, not reflow what
+   * is inside it.
+   */
+  contain: layout paint;
   transition:
-    block-size 0.3s ease-out,
-    content-visibility 0.3s allow-discrete;
+    block-size var(--card-open) var(--card-ease),
+    content-visibility var(--card-open) allow-discrete;
 }
 
 .card[open]::details-content {
@@ -345,20 +325,12 @@
 }
 
 .card[open] .card-a {
-  animation: card-drop 0.3s ease-out both;
+  animation: card-drop var(--card-open) var(--card-ease) both;
 }
 
-/* All of this is decoration — hold it still on request. */
+/* All of this is decoration — hold it still on request. The reef holds itself
+   still; see the end of Seafloor.css. */
 @media (prefers-reduced-motion: reduce) {
-  .deep-rays span,
-  .deep-bubbles span {
-    animation: none;
-  }
-
-  .deep-bubbles span {
-    opacity: 0.4;
-  }
-
   /* The card still opens; it just stops travelling to get there. */
   .card::details-content {
     transition: none;

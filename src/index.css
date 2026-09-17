@@ -48,32 +48,119 @@ body {
    * Every font-size on the site comes from one of the steps below; no rule
    * sets a raw size of its own.
    */
-  /*
-   * The water the wave sweep leaves behind. The transition overlay and the FAQ
-   * section paint this same stack from their own top edge, and the sweep ends
-   * by putting the FAQ's top exactly where the overlay was — so the two agree
-   * pixel for pixel and the handover is invisible.
-   *
-   * The scene is attached to the viewport rather than to either element. That
-   * keeps it composed at a sane scale down a section thousands of pixels tall,
-   * and means the overlay and the section show the same pixels of it without
-   * having to know anything about each other's position.
-   */
-  --sea-image: url('./assets/underwaterbackground.webp') center / cover fixed
-    no-repeat;
-  /*
-   * Dusk over the scene, deepening down the page. Stops are in px so they
-   * measure from each element's own top: percentages would resolve against two
-   * different heights and the handover would show.
-   */
-  --sea-column: linear-gradient(
-    180deg,
-    rgba(0, 22, 52, 0.46) 0,
-    rgba(0, 18, 44, 0.56) 700px,
-    rgba(0, 12, 32, 0.74) 1600px,
-    rgba(0, 7, 20, 0.86) 2600px
-  );
-  --sea-floor: #000814;
+  /* ------------------------------------------------------- the depths
+
+     One palette for everything below the wave. The FAQ's reef, the water it
+     hangs in and the ground the contact section cuts into are all drawn from
+     this block and nothing else — before it existed the same eight blues were
+     spelled out by hand in three stylesheets and had already drifted apart.
+
+     Sampled from the seafloor scene in components/Seafloor.jsx. Read it top to
+     bottom and it is the dive itself: surface, open water, dusk, sand.
+     -------------------------------------------------------------------- */
+
+  /* The water column, surface to sand. These seven are the FAQ's background
+     and nothing else — one gradient, in Faq.css, is their only consumer.
+
+     Deeper water than this opened on. The floor was lit like a shallow reef
+     at noon, which left the section the brightest thing on a site that is
+     otherwise night, and left the dive with nowhere to go. Each step is
+     roughly half the light it was, weighted so the deep end loses most: the
+     surface still reads as sunlit water, and the column actually darkens on
+     the way down instead of holding one brightness all the way.
+
+     The floor is *not* darkened with it. `--sand-lit` and its neighbours stay
+     where they were, so the sand now reads as lit ground under deep water
+     rather than more of the same tone — and, more to the point, `#contact`
+     opens on `--sand-lit`, so moving it would have opened a seam across the
+     join that token exists to close.
+
+     How far down they can go is set by the two things drawn on them, and both
+     are in the measured comments below. */
+
+  --sea-surface: #8ed6e8;
+  --sea-shallow: #54b3d2;
+  --sea-bright: #3491b9;
+  --sea-mid: #317ca9;
+  /* Floor of the range: the FAQ's cards are `--ink` panels *on* this water,
+     and the descent puts them over `--sea-mid` through `--sea-dusk`. Held at
+     3:1 against `--ink` so a card still reads as cut out of the scene; below
+     that it goes to a smudge with a cyan border round it. */
+  --sea-far: #4a6ea3;
+  --sea-dusk: #7464ab;
+  --sea-shore: #9b78a8;
+
+  /* Sand. `--sand-lit` is the palest thing down here and the contact section
+     opens on it, so the two meet without a line across them. */
+  --sand-lit: #fbeef4;
+  --sand: #f0d4e4;
+  --sand-deep: #dcbadd;
+  --pebble: #d9b8dd;
+  --pebble-pale: #e3c6e8;
+
+  /* Rock, near to far. The right-hand stack is a shade cooler than the left so
+     the two read as separate outcrops rather than a mirror. */
+  --reef-dark: #4054b8;
+  --reef-mid: #5a74d8;
+  --reef-lit: #7f9ce6;
+  --reef-dark-r: #4b60c6;
+  --reef-mid-r: #6a86dd;
+  --reef-lit-r: #93b4ec;
+  --reef-far: #6d86dd;
+  --reef-far-violet: #8a7ddc;
+  --reef-shade: rgba(20, 32, 100, 0.34);
+  --reef-shade-warm: rgba(20, 60, 120, 0.25);
+
+  /* Coral and the soft-bodied things among it. */
+  --coral: #ff4fa3;
+  --coral-lit: #ff77bd;
+  --coral-deep: #f5308f;
+  --coral-deep-2: #e0368f;
+  --coral-shade: rgba(120, 20, 80, 0.25);
+  --coral-veil: rgba(255, 79, 163, 0.4);
+  --anemone: #ff8fd0;
+  --anemone-lit: #ffa7dc;
+  --anemone-pale: #ffc2e7;
+  --brain: #8fd3f2;
+  --brain-pale: #bfe9fb;
+  --brain-deep: #7fc9ef;
+  --brain-deep-2: #4a9fd8;
+  --brain-shade: rgba(64, 84, 184, 0.24);
+  --kelp: #6cc9e8;
+  --kelp-lit: #a3e4c0;
+
+  /* The violets: the set on the bottom, and the urchin beside it. */
+  --violet: #8f4fd0;
+  --violet-lit: #d7bbfb;
+  --violet-lit-2: #c07ff0;
+  --violet-mid: #b06fe0;
+  --violet-mid-2: #9d5cd8;
+  --violet-dark: #6b32a8;
+  --violet-deep: #6f3bb0;
+  --violet-slot: #3b1a6e;
+  --violet-shade: rgba(58, 26, 112, 0.28);
+  --violet-cast: rgba(60, 30, 120, 0.28);
+  --violet-cast-deep: rgba(40, 16, 80, 0.3);
+  --violet-veil: rgba(123, 92, 255, 0.35);
+  --urchin: #6b46c1;
+  --urchin-lit: #7b5cff;
+  --urchin-pale: #a97dfb;
+  --urchin-deep: #4a2f9c;
+
+  /* Ink and light. `--ink` is the darkest thing in the water and the colour
+     every panel down here is cut from; `--foam` is the one bright edge. */
+  --ink: #0d1b4c;
+  --ink-lit: #16215c;
+  --ink-line: rgba(13, 27, 76, 0.28);
+  --foam: #2fd3f0;
+  --foam-pale: #9ef0ff;
+  --gold: #ffd166;
+  --gold-glow: rgba(255, 209, 102, 0.8);
+
+  /* The worn tape everything down here is played back on. */
+  --scanline: rgba(40, 20, 90, 0.12);
+  --fringe-pink: rgba(255, 0, 140, 0.1);
+  --fringe-cyan: rgba(0, 220, 255, 0.1);
 
   /*
    * Bevelled window chrome, in the site's palette rather than Win95 grey.
@@ -130,7 +217,7 @@ body {
 
 body {
   margin: 0;
-  /* Matches the canvas sky so overscroll never flashes the default page color. */
+  /* Matches the hero's sky so overscroll never flashes the default page color. */
   background: var(--sky);
   overflow-x: hidden;
 }

@@ -54,11 +54,41 @@ const WALL = 1 / (1 - CROP_TOP - CROP_BOTTOM)
 const FACE = 0.48
 
 /**
- * Share of the remaining distance covered per frame — the gesture's smoothing.
- * Enough to take the steps out of a wheel, little enough that the wave still
- * reads as something the reader is pushing rather than something playing back.
+ * The gesture's smoothing, as the stiffness of a critically damped spring in
+ * radians per second. The wave chases the push instead of being placed by it.
+ *
+ * A spring rather than "move a share of the remaining distance each frame",
+ * because that share is spent at its largest on the very first frame: the
+ * wave leaves at full speed and decays from there. A wheel notch is a large
+ * discrete push — around an eighth of the sweep, and the sweep is several
+ * screens of travel for the picture — so a slow scroll is a line of those
+ * arriving with gaps between them, and each one read as a lurch that trailed
+ * off rather than as movement. A spring has to accelerate first, so the same
+ * notch starts from nothing, and two that overlap add their momentum instead
+ * of the second one restarting the decay.
+ *
+ * Critically damped, so it never overshoots — the wave has a wall behind it
+ * and a rail tracking it, and neither should wobble at the end of a push.
+ * About 70ms to fold and a fifth of a second to settle: slow enough to take
+ * the steps out, fast enough that it still reads as the reader's own hand.
  */
-const EASE = 0.22
+const STIFFNESS = 14
+
+/**
+ * Longest frame the spring is stepped with, in seconds. A backgrounded tab
+ * comes back with a gap of seconds, and integrating it in one go would snap
+ * the wave across the screen; this makes it merely fast.
+ */
+const MAX_STEP = 0.05
+
+/**
+ * Close enough to stop, in sweep units and units per second. The distance is
+ * about a fifth of a pixel of wave travel, so what it cuts short is invisible
+ * rather than a pop — the old threshold was fifteen times that and could be
+ * seen landing.
+ */
+const SETTLED = 0.00006
+const STILL = 0.0008
 
 /**
  * How fast the sweep starts, against how fast it would run at an even rate.
@@ -117,6 +147,28 @@ export default function WaveTransition() {
     let target = 0
     /** What is actually drawn, chasing `target` — this is what makes it smooth. */
     let current = 0
+    /**
+     * How fast it is chasing, in sweep units per second. Carrying it between
+     * frames is the whole of what a spring has over a proportional follow:
+     * a second push arriving while the first is still running adds to this
+     * rather than starting a fresh decay from wherever the wave got to.
+     */
+    let velocity = 0
+    /** Timestamp of the last spring frame, so it is stepped by real time. */
+    let last = 0
+
+    /**
+     * The wave *is* at `p` — as opposed to being pushed towards it. Used
+     * wherever the sweep is positioned rather than driven: armed, released,
+     * rewound, or dropped by a drag on the rail. Killing the velocity is the
+     * part that matters; leaving it would have the spring carry on out of a
+     * position that was set, not thrown.
+     */
+    const place = (p) => {
+      target = p
+      current = p
+      velocity = 0
+    }
     /** Whether the depths are out of flow, waiting behind the wave. */
     let held = false
     /** Whether the wave currently owns the reader's scrolling. */
@@ -196,8 +248,7 @@ export default function WaveTransition() {
       held = false
       engaged = false
       stage.dataset.active = 'false'
-      target = 1
-      current = 1
+      place(1)
       lastY = seam
       window.scrollTo({ top: seam, behavior: 'instant' })
     }
@@ -221,8 +272,7 @@ export default function WaveTransition() {
        * wherever it was left, which is fully crossed: the questions pinned to
        * the top of the screen with the beach hidden behind them.
        */
-      target = 0
-      current = 0
+      place(0)
       hold(0)
     }
 
@@ -230,8 +280,7 @@ export default function WaveTransition() {
     const rewind = () => {
       engaged = false
       stage.dataset.active = 'false'
-      target = 0
-      current = 0
+      place(0)
       lastY = window.scrollY
     }
 
@@ -241,20 +290,54 @@ export default function WaveTransition() {
      * frame that never arrives can never leave a stale handle that blocks
      * every later scheduling attempt.
      */
-    const tick = () => {
-      const diff = target - current
-      current = Math.abs(diff) < 0.0015 ? target : current + diff * EASE
+    const tick = (now) => {
+      /*
+       * Real elapsed time, not "one frame". The spring is the same spring on
+       * a 60Hz panel, a 120Hz one, and across a frame the page dropped
+       * because a FAQ card was laying itself out — a per-frame constant is
+       * none of those things, and the dropped frame is exactly where a
+       * smoothing meant to hide a jolt would produce one.
+       */
+      const dt = last ? Math.min(MAX_STEP, (now - last) / 1000) : 1 / 60
+      last = now
+
+      /*
+       * Critically damped spring, solved rather than stepped: for x'' =
+       * -2w x' - w^2 x the exact answer is (x + (v + w x) t) e^-wt, so the
+       * length of the frame cannot make it drift or blow up the way an Euler
+       * step can when a frame runs long.
+       */
+      const x = current - target
+      if (Math.abs(x) < SETTLED && Math.abs(velocity) < STILL) {
+        current = target
+        velocity = 0
+      } else {
+        const decay = Math.exp(-STIFFNESS * dt)
+        const slope = velocity + STIFFNESS * x
+        const next = (x + slope * dt) * decay
+        velocity = (slope - STIFFNESS * (x + slope * dt)) * decay
+        current = target + next
+      }
+
       paint(current)
 
       if (engaged && heading > 0 && target >= 1 && current > 0.999) release()
       else if (engaged && heading < 0 && target <= 0 && current < 0.001) rewind()
 
       if (engaged || current !== target) frame = requestAnimationFrame(tick)
-      else frame = 0
+      else {
+        frame = 0
+        last = 0
+      }
     }
 
     const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(tick)
+      if (!frame) {
+        // Cleared, so the first frame of a new run measures one frame rather
+        // than however long the wave has been sitting still.
+        last = 0
+        frame = requestAnimationFrame(tick)
+      }
     }
 
     const engage = (from) => {
@@ -274,8 +357,7 @@ export default function WaveTransition() {
       lastY = pinned
       stage.dataset.active = 'true'
       heading = from > 0 ? -1 : 1
-      target = from
-      current = from
+      place(from)
       paint(current)
       schedule()
     }
@@ -341,8 +423,7 @@ export default function WaveTransition() {
         if (held) release()
         engaged = false
         stage.dataset.active = 'false'
-        target = 1
-        current = 1
+        place(1)
         window.scrollTo({ top: seam + (at - beach - sweep), behavior: 'instant' })
         lastY = window.scrollY
         return
@@ -361,8 +442,7 @@ export default function WaveTransition() {
         }
         engaged = false
         stage.dataset.active = 'false'
-        target = 0
-        current = 0
+        place(0)
         paint(0)
         window.scrollTo({ top: at, behavior: 'instant' })
         lastY = window.scrollY
@@ -393,8 +473,7 @@ export default function WaveTransition() {
        * next frame has nothing to chase, and the wave sits exactly where the
        * thumb was let go.
        */
-      target = p
-      current = p
+      place(p)
       paint(p)
       schedule()
     }
@@ -499,6 +578,25 @@ export default function WaveTransition() {
     const jumpTo = () => {
       const el = document.getElementById(location.hash.slice(1))
       if (!el) return
+
+      /*
+       * Drop the hash now that it has been served. It arrived from outside —
+       * the sponsor page's nav links come back here as `/#faq`, and either
+       * that or a bookmark is the only way one gets into the bar — and once
+       * the reader is moving it has done its whole job.
+       *
+       * Leaving it would undo, for exactly the links that cross between the
+       * two documents, the thing `onNavClick` is careful about for every link
+       * that does not: an address bar reading `/#faq` says the reader is on
+       * some other page called faq, when they are on the title screen looking
+       * at a section of it. `replaceState` rather than assigning to
+       * `location.hash` — it rewrites the entry rather than adding one, so
+       * Back still goes to the sponsor page and not to this same page minus a
+       * fragment, and unlike an assignment it fires no `hashchange`, so this
+       * handler is not re-entered.
+       */
+      history.replaceState(null, '', location.pathname + location.search)
+
       if (reduce.matches) {
         el.scrollIntoView({ behavior: 'instant', block: 'start' })
         return
@@ -611,9 +709,24 @@ export default function WaveTransition() {
     // has asked for less motion, in which case the page stays as written.
     if (!reduce.matches && window.scrollY <= boundary()) hold(0)
 
-    // The about section settles as its fonts and images arrive, which moves
-    // the seam — watch for it rather than trusting the first measurement.
-    const observer = new ResizeObserver(onResize)
+    /*
+     * The about section settles as its fonts and images arrive, which moves
+     * the seam — watch for it rather than trusting the first measurement.
+     *
+     * Coalesced, because the page also changes length on every frame of
+     * anything that grows it: a FAQ card opening runs `block-size` from 0 to
+     * the answer's height, and answering each of those frames meant a
+     * `getBoundingClientRect` — a forced layout — plus a repaint of the wave,
+     * landing inside the card's own layout pass. The seam is above the FAQ and
+     * does not move when a card opens, so none of that work changed anything.
+     * Viewport resizes are still handled immediately, by the `resize` listener
+     * below; this is only the slower "the page settled" signal.
+     */
+    let settle = 0
+    const observer = new ResizeObserver(() => {
+      clearTimeout(settle)
+      settle = setTimeout(onResize, 100)
+    })
     observer.observe(document.body)
 
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -637,6 +750,7 @@ export default function WaveTransition() {
     if (location.hash) landing = requestAnimationFrame(jumpTo)
 
     return () => {
+      clearTimeout(settle)
       clearDriver(driver)
       stopSeek()
       cancelAnimationFrame(frame)

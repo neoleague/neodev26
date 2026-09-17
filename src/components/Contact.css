@@ -9,7 +9,9 @@
    ========================================================================== */
 
 #contact {
-  --ore: #ffd166;
+  /* The same gold the lamp over the television is lit in. */
+  --ore: var(--gold);
+  --cut-line: color-mix(in srgb, var(--grid) 13%, transparent);
   --cut-cell: 64px;
 
   position: relative;
@@ -20,10 +22,25 @@
   /* Land clear of the pinned masthead when the nav link jumps here. */
   scroll-margin-top: 76px;
   /*
-   * Ground. It opens on the seabed colour the FAQ closes on so the two
-   * sections meet without a line across them, then settles into the dark.
+   * Ground. It opens on the colour the FAQ closes on so the two sections meet
+   * without a line across them, then settles into the dark.
+   *
+   * That handover colour used to be the seabed's near-black. The reef the FAQ
+   * now ends on is pale sand, so this opens on sand instead — and goes under
+   * it quickly, within the first sixth, because everything printed on this
+   * section is light and needs the dark to read against. What is left is a
+   * band of beach at the top and then the cut below it, which is what a
+   * section drawing of the ground under a seabed should look like anyway.
    */
-  background: linear-gradient(180deg, #000814 0, #0d0620 34%, #13061f 100%);
+  background: linear-gradient(
+    180deg,
+    var(--sand-lit) 0,
+    var(--sand) 3%,
+    var(--sand-deep) 7%,
+    var(--ink) 18%,
+    #0d0620 44%,
+    #13061f 100%
+  );
 }
 
 /*
@@ -36,9 +53,11 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* `--grid` is the floor the title screen rushes over; the same purple, laid
+     flat, is the survey over the ground under the sea. */
   background-image:
-    linear-gradient(90deg, rgba(209, 127, 255, 0.13) 0 1px, transparent 1px),
-    linear-gradient(180deg, rgba(209, 127, 255, 0.13) 0 1px, transparent 1px);
+    linear-gradient(90deg, var(--cut-line) 0 1px, transparent 1px),
+    linear-gradient(180deg, var(--cut-line) 0 1px, transparent 1px);
   background-size: var(--cut-cell) var(--cut-cell);
   /* Strongest at the top of the cut and gone by the bottom. */
   -webkit-mask-image: linear-gradient(180deg, #000 0, transparent 88%);

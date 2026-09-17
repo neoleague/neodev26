@@ -1,0 +1,39 @@
+/* ---------------------------------------------------------------------------
+   The scene behind the title screen.
+
+   A baked loop rather than a canvas — see HeroBackdrop.jsx for why, and
+   `src/scene/synthwave.js` for the code it was rendered from.
+   -------------------------------------------------------------------------- */
+
+.page-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  width: 100%;
+  height: 100%;
+
+  /*
+   * `--sky` is the loop's own sky colour, so the moment before the poster has
+   * decoded is the top of the picture rather than a flash of black.
+   */
+  background: var(--sky);
+
+  /*
+   * Sized against the height on anything narrower than 16:9, which is every
+   * phone: the loop is cropped at the sides and the horizon stays put at the
+   * same fraction of the viewport the canvas used to place it at. Only a
+   * viewport wider than 16:9 crops vertically, and then only a little.
+   */
+  object-fit: cover;
+}
+
+/*
+ * The element is decoration and holds no controls, so it is not a stop on the
+ * way through the page. `tabIndex={-1}` in the component covers browsers that
+ * make a <video> focusable regardless; this covers the rest.
+ */
+.page-background::-webkit-media-controls {
+  display: none !important;
+}
