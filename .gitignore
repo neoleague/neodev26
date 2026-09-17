@@ -24,3 +24,28 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Intermediate frames from tools/hero-loop.mjs — the encoded loop is what ships.
+tools/.hero-frames/
+
+# ---------------------------------------------------------------- derived art
+#
+# Everything below is produced by a script in tools/ and is never edited by
+# hand, so the source it is cut from is what belongs in git. See the pictures
+# section of CLAUDE.md. A fresh clone has to run both scripts before it can
+# build: the components import these files by name.
+
+# The photographs. tools/photos.mjs cuts each one from the camera master
+# sitting beside it in the same year folder, to twice the largest its slot is
+# ever painted. The masters are tracked; these are not.
+src/assets/[0-9][0-9][0-9][0-9]/*.webp
+
+# The hero loop and its poster frame, both rendered by tools/hero-loop.mjs
+# from src/scene/synthwave.js.
+src/assets/hero-loop.webm
+src/assets/hero-still.webp
+
+# src/assets/wave.webp is deliberately NOT in this list. It has no script and
+# no master in the tree -- it arrived as a lossless WebP that was compressed
+# once, by hand, and the original is only in the first commit. That makes it a
+# source file, not an artifact.
