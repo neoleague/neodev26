@@ -1,0 +1,91 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'williams_tools/admin/css/table_downloader.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="downloader-container">
+    <h1>Database Table Downloader</h1>
+    <p>Select an application model, configure field output and query filters, then copy or download table data.</p>
+
+    <!-- App & Model Selection -->
+    <div class="card">
+        <h2>Select Model</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="app-select">Application:</label>
+                <select id="app-select">
+                    <option value="">-- Select App --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="model-select">Model:</label>
+                <select id="model-select" disabled>
+                    <option value="">-- Select Model --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="filetype-select">Export Format:</label>
+                <select id="filetype-select">
+                    <option value="json">JSON</option>
+                    <option value="csv">CSV</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Field Selection Menu -->
+    <div class="card">
+        <h2>Select Fields to Include</h2>
+        <div class="fields-menu-container">
+            <div class="field-actions">
+                <button type="button" id="btn-select-all" class="btn-secondary" disabled>Select All</button>
+                <button type="button" id="btn-deselect-all" class="btn-secondary" disabled>Deselect All</button>
+                <button type="button" id="btn-invert-select" class="btn-secondary" disabled>Invert Selection</button>
+            </div>
+            
+            <div id="field-checkboxes-container" class="checkbox-grid">
+                <span class="help-text">Select a model above to display available fields.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Filter Builder -->
+    <div class="card">
+        <h2>Query Filters</h2>
+        <p class="help-text margin-bottom">Add ORM lookup conditions (e.g., <code>is_active</code> = <code>true</code> or custom lookup suffixes like <code>user__is_staff</code>).</p>
+        
+        <div id="filter-rows-container">
+            <!-- Filter rows get inserted here dynamically -->
+        </div>
+
+        <div class="margin-top">
+            <button type="button" id="add-filter-btn" class="btn-secondary" disabled>+ Add Filter Condition</button>
+        </div>
+    </div>
+
+    <!-- Output Preview & Download -->
+    <div class="card">
+        <div class="output-header">
+            <h2>Output</h2>
+            <div class="output-actions">
+                <button type="button" id="get-table-btn" class="btn-primary" disabled>Get Table</button>
+                <button type="button" id="copy-btn" class="btn-secondary" disabled>Copy to Clipboard</button>
+                <button type="button" id="download-btn" class="btn-success" disabled>Download File</button>
+            </div>
+        </div>
+        <div id="status-bar" class="status-bar">Status: Idle</div>
+        <textarea id="output-textbox" rows="12" readonly placeholder="Output will appear here after clicking 'Get Table'..."></textarea>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+    <script src="{% static 'williams_tools/admin/js/table_downloader.js' %}"></script>
+{% endblock %}

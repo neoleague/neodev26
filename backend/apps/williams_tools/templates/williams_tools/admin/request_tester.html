@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'williams_tools/admin/css/request_tester.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="tester-container">
+    <h1>API Request Tester</h1>
+    <p>Enter a URL (e.g., <code>/api/problem/</code>) to test the API views. This uses your current admin session.</p>
+
+    <div class="input-group">
+        <select id="method-select" class="method-dropdown">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+        </select>
+
+        <input type="text" id="url-input" placeholder="/api/endpoint/" value="">
+        <button class="btn-submit" id="submit-btn">Submit Request</button>
+    </div>
+
+    <div id="payload-container" style="display: none; margin-bottom: 20px;">
+        <label for="payload-input" style="display: block; margin-bottom: 5px;">JSON Payload:</label>
+        <textarea id="payload-input" rows="5" placeholder='{"key": "value"}' style="width: 100%; font-family: monospace;"></textarea>
+    </div>
+
+    <div class="result-container">
+        <div id="status-display" class="status-bar">Status: ---</div>
+        <iframe id="response-frame" name="response-frame"></iframe>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+    <script src="{% static 'williams_tools/admin/js/request_tester.js' %}"></script>
+{% endblock %}

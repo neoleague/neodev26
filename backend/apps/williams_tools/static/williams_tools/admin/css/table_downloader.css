@@ -1,0 +1,226 @@
+.downloader-container {
+    padding: 20px;
+    max-width: 1000px;
+    color: var(--body-fg);
+}
+
+.downloader-container h1 {
+    color: var(--body-loud-color);
+    margin-bottom: 5px;
+}
+
+.card {
+    background: var(--body-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--body-loud-color);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: var(--body-quiet-color);
+}
+
+.form-group select,
+.filter-row select,
+.filter-row input {
+    padding: 6px 10px;
+    height: 38px;
+    line-height: 1.4;
+    border: 1px solid var(--border-color);
+    background-color: var(--darkened-bg);
+    color: var(--body-fg);
+    border-radius: 4px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.form-group select:focus, 
+.filter-row select:focus,
+.filter-row input:focus {
+    outline: 2px solid var(--link-selected-fg);
+    border-color: var(--link-fg);
+}
+
+.help-text {
+    font-size: 0.85rem;
+    color: var(--body-quiet-color);
+}
+
+.margin-bottom {
+    margin-bottom: 15px;
+}
+
+.margin-top {
+    margin-top: 15px;
+}
+
+/* Dynamic Filter Row Layout */
+.filter-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.filter-key-input {
+    flex: 2;
+}
+
+.filter-val-input {
+    flex: 3;
+    font-family: monospace !important;
+}
+
+.btn-remove-filter {
+    background: var(--message-error-bg);
+    color: var(--primary-fg);
+    border: none;
+    height: 38px;
+    width: 38px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-remove-filter:hover {
+    opacity: 0.8;
+}
+
+.fields-menu-container {
+    margin-top: 5px;
+}
+
+.field-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid var(--hairline-color);
+    background: var(--darkened-bg);
+    border-radius: 4px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.checkbox-item input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.output-actions {
+    display: flex;
+    gap: 10px;
+}
+
+#output-textbox {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: monospace;
+    background-color: var(--darkened-bg);
+    color: var(--body-fg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+    resize: vertical;
+}
+
+.status-bar {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-family: monospace;
+    background: var(--darkened-bg);
+}
+
+.status-ok {
+    background-color: var(--message-success-bg);
+    color: var(--primary-fg);
+}
+
+.status-err {
+    background-color: var(--message-error-bg);
+    color: var(--primary-fg);
+}
+
+/* Buttons */
+.btn-primary, .btn-secondary, .btn-success {
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+.btn-primary {
+    background: var(--header-bg);
+    color: var(--primary-fg);
+}
+
+.btn-secondary {
+    background: var(--darkened-bg);
+    color: var(--body-fg);
+    border: 1px solid var(--border-color);
+}
+
+.btn-success {
+    background: var(--message-success-bg);
+    color: var(--primary-fg);
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-secondary:hover:not(:disabled),
+.btn-success:hover:not(:disabled) {
+    background: var(--link-hover-color);
+    color: var(--header-color);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-success:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

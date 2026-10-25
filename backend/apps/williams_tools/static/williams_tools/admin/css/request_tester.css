@@ -1,0 +1,101 @@
+.tester-container { 
+    padding: 20px; 
+    max-width: 1000px; 
+    color: var(--body-fg); 
+}
+
+.tester-container h1 {
+    color: var(--body-loud-color);
+}
+
+.input-group { 
+    display: flex; 
+    gap: 10px; 
+    margin-bottom: 20px; 
+}
+
+#url-input { 
+    flex-grow: 1; 
+    padding: 10px; 
+    font-family: monospace; 
+    border: 1px solid var(--border-color); 
+    background-color: var(--darkened-bg);
+    color: var(--body-fg);
+    border-radius: 4px; 
+}
+
+#url-input:focus {
+    outline: 2px solid var(--link-selected-fg);
+    border-color: var(--link-fg);
+}
+
+.btn-submit { 
+    background: var(--header-bg); 
+    color: var(--primary-fg); 
+    border: none; 
+    padding: 10px 20px; 
+    cursor: pointer; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    transition: background 0.2s;
+}
+
+.btn-submit:hover { 
+    background: var(--link-hover-color);
+    color: var(--header-color);
+}
+
+.method-dropdown {
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    background: var(--darkened-bg);
+    color: var(--body-fg);
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+#payload-input {
+    tab-size: 4;
+    -moz-tab-size: 4;
+    font-family: monospace;
+    background: var(--body-bg);
+    color: var(--body-fg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.hidden { display: none !important; }
+
+.result-container { 
+    background: var(--body-bg); 
+    border: 1px solid var(--border-color); 
+    border-radius: 4px; 
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.status-bar { 
+    padding: 8px 15px; 
+    border-bottom: 1px solid var(--hairline-color); 
+    background: var(--darkened-bg);
+    font-weight: bold; 
+    font-family: monospace;
+}
+
+.status-200 { 
+    background-color: var(--message-success-bg);
+    color: var(--primary-fg); 
+}
+
+.status-error { 
+    background-color: var(--message-error-bg);
+    color: var(--primary-fg);
+}
+
+#response-frame {
+    width: 100%;
+    min-height: 500px; /* Give it enough room to show the Django error page */
+    background: white; /* Ensures HTML pages are readable */
+    display: block;
+}
