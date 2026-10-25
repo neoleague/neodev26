@@ -26,9 +26,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Node / Frontend Build
-node_modules/
-dist/
-dist-ssr/
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
 *.local
 
 # Editor directories and OS files
@@ -43,7 +43,7 @@ dist-ssr/
 *.sw?
 
 # Intermediate frames from tools/hero-loop.mjs — the encoded loop is what ships.
-tools/.hero-frames/
+frontend/tools/.hero-frames/
 
 # ---------------------------------------------------------------- derived art
 #
@@ -55,12 +55,12 @@ tools/.hero-frames/
 # The photographs. tools/photos.mjs cuts each one from the camera master
 # sitting beside it in the same year folder, to twice the largest its slot is
 # ever painted. The masters are tracked; these are not.
-src/assets/[0-9][0-9][0-9][0-9]/*.webp
+frontend/src/assets/[0-9][0-9][0-9][0-9]/*.webp
 
 # The hero loop and its poster frame, both rendered by tools/hero-loop.mjs
 # from src/scene/synthwave.js.
-src/assets/hero-loop.webm
-src/assets/hero-still.webp
+frontend/src/assets/hero-loop.webm
+frontend/src/assets/hero-still.webp
 
 # src/assets/wave.webp is deliberately NOT in this list. It has no script and
 # no master in the tree -- it arrived as a lossless WebP that was compressed
